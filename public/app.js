@@ -24,6 +24,18 @@
     { part: 'Closing', short: 'The Holy Place', title: 'Past the outer courts', lyric: 'Take me past the outer courts / Into the Holy Place', body: 'The tabernacle moves from the outer court to the Holy Place, nearer to God. The song asks to be taken the whole way in, clothed in His majesty. Fireworks is the picture for that glory.', ref: 'Hebrews 10:19–22 · Exodus 26:33', motif: 'gate', holy: true }
   ];
   var HOLY = 8, GOAL = 8;
+  /* the real galaxy each scene is drawn after (pairings are CreatorLab's, based on each galaxy's name or look) */
+  var REAL = [
+    { name: 'Sunflower Galaxy', id: 'M63', note: 'A golden spiral with many short, feathery arms, named for its likeness to a sunflower. Paired with the first light of day when the rooster crows.' },
+    { name: 'Sombrero Galaxy', id: 'M104', note: 'A glowing round bulge cut across by a dark lane of dust, like a loaf broken in two.' },
+    { name: 'Andromeda Galaxy', id: 'M31', note: 'Named for the princess in Greek myth who was chained and then rescued. It is the nearest large galaxy to ours.' },
+    { name: 'NGC 1300', id: '', note: 'A barred spiral with a straight bar of stars through its center, like the staff of Moses.' },
+    { name: 'Black Eye Galaxy', id: 'M64', note: 'Also called the Sleeping Beauty galaxy, for the dark band of dust across its bright core. Paired with Lazarus, called out of sleep.' },
+    { name: 'Whirlpool Galaxy', id: 'M51', note: 'A grand spiral swirling like water, with a smaller galaxy beside it.' },
+    { name: 'Cigar Galaxy', id: 'M82', note: 'A starburst galaxy making stars at a furious pace, with red glowing gas streaming out from its center.' },
+    { name: 'Cartwheel Galaxy', id: '', note: 'A ring galaxy shaped by a collision about 400 million years ago, with ripples spreading outward like a storm.' },
+    { name: 'Fireworks Galaxy', id: 'NGC 6946', note: 'Nicknamed for its supernovae: ten have been seen in about 50 years. It is about 22 million light-years away, and it shares its name with the song.' }
+  ];
   /* where each galaxy sits in the song: index into FULL, the label shown, and the lines to highlight */
   var SONGPOS = [
     { sec: 0, label: 'Verse 1', hl: ['I denied you three times', 'I heard the rooster crow'] },
@@ -44,6 +56,10 @@
     ['The build', ['If you shone upon Moses', 'Would you shine upon me?', 'Like when you gave life to Lazarus', 'When you parted the sea', '', 'When you stood in the fire', 'Calmed the storm with a word', 'If you shone upon Moses', 'I wanna see your fireworks']],
     ['Closing', ['Take me past the outer courts (Into the Holy Place)', 'I long to see the fireworks (That shine upon your face)', 'I’m clothed in your majesty (Protection for my Soul)', 'Protection for my Soul']]
   ];
+  function realHTML(i) {
+    var r = REAL[i]; if (!r) return '';
+    return '<div class="realgal"><p class="eyebrow mono">The real galaxy</p><p class="realgal-name">' + r.name + (r.id ? ' <span class="mono">' + r.id + '</span>' : '') + '</p><p>' + r.note + '</p><p class="fine">This art is drawn by CreatorLab in the style of that galaxy. It is not a photograph.</p></div>';
+  }
   function inSongHTML(i) {
     var sp = SONGPOS[i], sec = FULL[sp.sec];
     var lines = sec[1].map(function (l) { if (l === '') return '<br>'; var on = sp.hl.indexOf(l) >= 0; return on ? '<mark>' + l + '</mark>' : l; });
@@ -79,7 +95,7 @@
     if (s.holy && !unlocked) {
       return '<p class="eyebrow mono">' + s.part + '</p><h2>The inner court is sealed</h2><p>Visit the other eight galaxies first. Each one is a scene from the song, and each one opens a little more of the way in.</p><p class="prog mono">' + foundCount + ' of ' + GOAL + ' visited</p><div class="gnav"><button class="btn btn-gold" type="button" data-gal="back">Back to the cosmos</button></div>';
     }
-    var h = '<p class="eyebrow mono">Galaxy ' + (i + 1) + ' of 9 · ' + s.part + '</p><h2>' + s.title + '</h2><p class="lyric">“' + s.lyric.replace(/ \/ /g, '<br>') + '”</p><p>' + s.body + '</p><span class="ref mono">' + s.ref + '</span>' + inSongHTML(i);
+    var h = '<p class="eyebrow mono">Galaxy ' + (i + 1) + ' of 9 · ' + s.part + '</p><h2>' + s.title + '</h2><p class="lyric">“' + s.lyric.replace(/ \/ /g, '<br>') + '”</p><p>' + s.body + '</p><span class="ref mono">' + s.ref + '</span>' + inSongHTML(i) + realHTML(i);
     h += navHTML(i);
     if (s.holy) {
       h += '<p style="margin-top:26px">This is where Adam’s prayer ends: past the outer courts, into the Holy Place. The fireworks are the glory of God.</p><div class="actions"><button class="btn btn-gold" type="button" data-go="release">See the release</button><a class="btn btn-ghost" href="' + SPOTIFY + '" target="_blank" rel="noopener">Listen on Spotify</a></div>' + lyricsHTML();
@@ -266,7 +282,7 @@
     var SZ = phone ? 1.9 : 1.45, sc = phone ? 0.75 : 1;
     function Dust() { this.p = []; this.c = []; this.s = []; this.m = []; this.q = []; this.h = []; }
     Dust.prototype.add = function (x, y, z, col, size, mot, a, b, c) { this.p.push(x, y, z); this.c.push(col[0], col[1], col[2]); this.s.push(size * SZ); this.m.push(mot || 0); this.q.push(a || 0, b || 0, c || 0); this.h.push(R()); };
-    Dust.prototype.build = function () {
+    Dust.prototype.build = function (mat) {
       var g = new THREE.BufferGeometry();
       g.setAttribute('position', new THREE.Float32BufferAttribute(this.p, 3));
       g.setAttribute('aColor', new THREE.Float32BufferAttribute(this.c, 3));
@@ -274,7 +290,7 @@
       g.setAttribute('aMotion', new THREE.Float32BufferAttribute(this.m, 1));
       g.setAttribute('aC', new THREE.Float32BufferAttribute(this.q, 3));
       g.setAttribute('aPh', new THREE.Float32BufferAttribute(this.h, 1));
-      var pts = new THREE.Points(g, dustMat); pts.frustumCulled = false; return pts;
+      var pts = new THREE.Points(g, mat || dustMat); pts.frustumCulled = false; return pts;
     };
     function ring(d, ox, oz, rad, y, n, col, size) { for (var i = 0; i < n; i++) { var a = i / n * 6.2832; d.add(ox + Math.cos(a) * rad, GROUND + y, oz + Math.sin(a) * rad, col, size, 0); } }
 
@@ -314,7 +330,7 @@
     /* ---------- The cover, rebuilt from its own pixels ---------- */
     var FIG_VS = [
       'attribute vec3 aColor; attribute float aFace; attribute vec3 aR;',
-      'uniform float uPhone; uniform float uTime; uniform float uPx; uniform float uAudio; uniform float uAssemble; uniform float uBurst; uniform float uPointPow; uniform vec3 uBurstC; uniform vec3 uPointer;',
+      'uniform float uBright; uniform float uPhone; uniform float uTime; uniform float uPx; uniform float uAudio; uniform float uAssemble; uniform float uBurst; uniform float uPointPow; uniform vec3 uBurstC; uniform vec3 uPointer;',
       'varying vec3 vColor; varying float vA;',
       'float eo(float x){ return 1.0-pow(1.0-x,3.0); }',
       'void main(){',
@@ -329,13 +345,13 @@
       '  vec3 dir = normalize(p-uBurstC+(aR-0.5)*0.9);',
       '  p += dir*uBurst*(0.5+aR.z*2.4)*(aFace>0.5?2.2:0.8);',
       '  float tw = 0.8+0.2*sin(t*2.0+aR.x*40.0);',
-      '  vColor = aColor*(1.0+uAudio*0.5+uBurst*0.6); vA = (0.8-aFace*0.1)*tw*(0.3+0.7*d);',
+      '  vColor = aColor*uBright*(1.0+uAudio*0.5+uBurst*0.6); vA = (0.8-aFace*0.1)*tw*(0.3+0.7*d);',
       '  vec4 mv = modelViewMatrix*vec4(p,1.0);',
       '  gl_PointSize = min((aFace>0.5?3.3:2.9)*uPhone*(0.75+aR.y*0.9)*uPx*(9.0/-mv.z)*(1.0+uAudio*0.5+uBurst*0.6), 14.0*uPx);',
       '  gl_Position = projectionMatrix*mv;',
       '}'
     ].join('\n');
-    var figU = { uPhone: { value: phone ? 1.3 : 1 }, uTime: tU, uPx: { value: DPR }, uAudio: audU, uAssemble: { value: 0 }, uBurst: { value: 0 }, uPointPow: { value: 0 }, uBurstC: { value: new THREE.Vector3(0.08, 1.26, 0.2) }, uPointer: { value: new THREE.Vector3(99, 99, 99) } };
+    var figU = { uBright: { value: 1.75 }, uPhone: { value: phone ? 1.3 : 1 }, uTime: tU, uPx: { value: DPR }, uAudio: audU, uAssemble: { value: 0 }, uBurst: { value: 0 }, uPointPow: { value: 0 }, uBurstC: { value: new THREE.Vector3(0.08, 1.26, 0.2) }, uPointer: { value: new THREE.Vector3(99, 99, 99) } };
     (function () {
       var N = 200, cv = document.createElement('canvas'); cv.width = cv.height = N;
       var cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, N, N);
@@ -427,36 +443,50 @@
     function sstep(a, b, x) { x = (x - a) / (b - a); x = x < 0 ? 0 : x > 1 ? 1 : x; return x * x * (3 - 2 * x); }
     /* one parameter set per scene, modelled on real galaxies: M51, Andromeda, Pinwheel, a dusty Hubble spiral, an illustrated Milky Way */
     var GX = [
-      { arms: 2, pitch: 0.38, sharp: 2.4, bulgeR: 0.09, bulgeAmp: 1.3, diskAmp: 0.55, armAmp: 1.0, dust: 0.8, dustOff: 0.75, dustSharp: 2.5, hii: 1.0, core: [1, 0.88, 0.68], arm: [0.55, 0.72, 1], hiiCol: [1, 0.35, 0.45], incl: 0.25, roll: 0.5, phase: 0, fog: 0.15, comps: [{ x: 0.95, y: 0.55, s: 0.34, col: [1, 0.86, 0.6] }] },
+      { arms: 5, pitch: 0.55, sharp: 1.1, brk: 0.8, bulgeR: 0.08, bulgeAmp: 1.2, diskAmp: 0.85, armAmp: 1.35, dust: 0.3, dustOff: 0.6, dustSharp: 1.5, hii: 0.5, core: [1, 0.84, 0.55], arm: [0.78, 0.82, 1], hiiCol: [1, 0.6, 0.5], incl: 0.3, roll: 0.2, phase: 0, fog: 0.3, comps: [] },
+      { arms: 2, pitch: 0.3, sharp: 2, bulgeR: 0.22, bulgeAmp: 2.4, diskAmp: 1.2, armAmp: 0.25, dust: 0.1, dustOff: 0.5, dustSharp: 2, dustBand: 1.7, dustBandR: 0.36, dustBandW: 0.05, hii: 0.05, core: [1, 0.95, 0.85], arm: [1, 0.92, 0.8], hiiCol: [1, 0.7, 0.5], incl: 1.36, roll: 0.35, phase: 0, fog: 0.7, comps: [] },
       { arms: 2, pitch: 0.21, sharp: 2.0, bulgeR: 0.12, bulgeAmp: 1.5, diskAmp: 0.6, armAmp: 0.9, dust: 1.0, dustOff: 0.5, dustSharp: 2.0, hii: 0.6, core: [1, 0.88, 0.66], arm: [0.55, 0.66, 0.95], hiiCol: [1, 0.45, 0.5], incl: 1.15, roll: 0.9, phase: 0.3, fog: 0.1, comps: [{ x: 0.55, y: -0.9, s: 0.14, col: [0.85, 0.92, 1] }, { x: -0.75, y: 0.45, s: 0.12, col: [1, 0.95, 0.85] }] },
-      { arms: 3, pitch: 0.3, sharp: 2.0, bulgeR: 0.08, bulgeAmp: 1.1, diskAmp: 0.6, armAmp: 1.1, dust: 0.6, dustOff: 0.6, dustSharp: 2.0, hii: 0.8, core: [1, 0.85, 0.7], arm: [0.6, 0.75, 1], hiiCol: [0.95, 0.55, 0.7], incl: 0.15, roll: 0, phase: 1.1, fog: 0.1, comps: [] },
-      { arms: 2, pitch: 0.45, sharp: 1.6, bulgeR: 0.16, bulgeAmp: 1.6, diskAmp: 1.0, armAmp: 0.7, dust: 1.1, dustOff: 0.9, dustSharp: 1.6, hii: 0.25, core: [1, 0.9, 0.72], arm: [0.92, 0.8, 0.72], hiiCol: [1, 0.6, 0.4], incl: 0.6, roll: -0.4, phase: 0.6, fog: 0.5, comps: [] },
-      { arms: 2, pitch: 0.2, sharp: 2.0, bulgeR: 0.16, bulgeAmp: 1.7, diskAmp: 0.8, armAmp: 0.8, dust: 0.9, dustOff: 0.45, dustSharp: 2.0, hii: 1.4, core: [1, 0.62, 0.3], arm: [0.5, 0.55, 0.95], hiiCol: [1, 0.2, 0.3], incl: 1.2, roll: -1.1, phase: 0.8, fog: 0.15, comps: [{ x: -0.85, y: -0.5, s: 0.13, col: [0.9, 0.95, 1] }, { x: 0.8, y: 0.35, s: 0.1, col: [1, 0.95, 0.85] }] },
-      { arms: 4, pitch: 0.27, sharp: 1.5, bulgeR: 0.1, bulgeAmp: 1.5, diskAmp: 0.7, armAmp: 1.2, dust: 0.5, dustOff: 0.5, dustSharp: 1.8, hii: 0.5, core: [1, 0.78, 0.82], arm: [0.62, 0.45, 1], hiiCol: [1, 0.45, 0.8], incl: 0.95, roll: 0.15, phase: 0.4, fog: 0.3, comps: [] },
-      { arms: 2, pitch: 0.34, sharp: 2.2, bulgeR: 0.1, bulgeAmp: 1.4, diskAmp: 0.6, armAmp: 1.0, dust: 0.85, dustOff: 0.7, dustSharp: 2.3, hii: 0.9, core: [1, 0.8, 0.5], arm: [0.78, 0.72, 0.9], hiiCol: [1, 0.4, 0.35], incl: 0.35, roll: 2.2, phase: 2.0, fog: 0.2, comps: [{ x: -0.9, y: -0.6, s: 0.3, col: [1, 0.8, 0.55] }] },
-      { arms: 3, pitch: 0.3, sharp: 1.6, bulgeR: 0.09, bulgeAmp: 1.2, diskAmp: 0.6, armAmp: 1.2, dust: 0.4, dustOff: 0.5, dustSharp: 1.8, hii: 0.6, core: [0.92, 0.85, 1], arm: [0.4, 0.45, 1], hiiCol: [0.85, 0.4, 1], incl: 0.8, roll: -0.6, phase: 0.2, fog: 0.3, comps: [] },
-      { arms: 3, pitch: 0.3, sharp: 1.9, bulgeR: 0.09, bulgeAmp: 1.4, diskAmp: 0.6, armAmp: 1.0, dust: 0.55, dustOff: 0.55, dustSharp: 2.0, hii: 0.5, core: [1, 0.95, 0.8], arm: [1, 0.85, 0.6], hiiCol: [1, 0.6, 0.4], incl: 0.2, roll: 0.3, phase: 0.9, fog: 0.2, comps: [] }
+      { arms: 2, pitch: 0.4, sharp: 1.7, armIn: 0.2, bar: 1.7, barLen: 0.4, barAngle: 0.5, bulgeR: 0.07, bulgeAmp: 1.1, diskAmp: 0.5, armAmp: 1.35, dust: 0.65, dustOff: 0.8, dustSharp: 2, hii: 1.1, core: [1, 0.82, 0.55], arm: [0.6, 0.72, 1], hiiCol: [1, 0.4, 0.6], incl: 0.45, roll: -0.5, phase: 0.55, fog: 0.15, comps: [] },
+      { arms: 2, pitch: 0.22, sharp: 1.8, bulgeR: 0.17, bulgeAmp: 2.1, diskAmp: 0.85, armAmp: 0.45, dust: 0.7, dustOff: 0.4, dustSharp: 1.8, dustBand: 1.3, dustBandR: 0.22, dustBandW: 0.07, hii: 0.3, core: [1, 0.9, 0.7], arm: [0.8, 0.82, 0.95], hiiCol: [1, 0.55, 0.5], incl: 0.85, roll: -0.4, phase: 0.3, fog: 0.4, comps: [] },
+      { arms: 2, pitch: 0.38, sharp: 2.4, bulgeR: 0.09, bulgeAmp: 1.3, diskAmp: 0.55, armAmp: 1.0, dust: 0.8, dustOff: 0.75, dustSharp: 2.5, hii: 1.0, core: [1, 0.88, 0.68], arm: [0.55, 0.72, 1], hiiCol: [1, 0.35, 0.45], incl: 0.25, roll: 0.5, phase: 0, fog: 0.15, comps: [{ x: 0.95, y: 0.55, s: 0.34, col: [1, 0.86, 0.6] }] },
+      { arms: 2, pitch: 0.3, sharp: 1.2, brk: 0.7, bulgeR: 0.07, bulgeAmp: 1.1, diskAmp: 1.1, armAmp: 0.6, dust: 0.9, dustOff: 0.3, dustSharp: 1.5, hii: 2.8, core: [1, 0.78, 0.62], arm: [0.95, 0.72, 0.72], hiiCol: [1, 0.28, 0.3], incl: 1.5, roll: 0.9, phase: 1, fog: 0.3, plume: true, comps: [] },
+      { kind: 'ring', bulgeR: 0.05, bulgeAmp: 1.3, core: [1, 0.85, 0.6], arm: [0.55, 0.72, 1], hiiCol: [1, 0.45, 0.72], hii: 1.6, dust: 0, incl: 0.55, roll: 0.3, phase: 0, fog: 0.1, comps: [{ x: -0.9, y: -0.55, s: 0.1, col: [0.9, 0.95, 1] }, { x: 0.85, y: 0.6, s: 0.08, col: [1, 0.92, 0.8] }] },
+      { arms: 3, pitch: 0.3, sharp: 1.5, brk: 0.45, bulgeR: 0.08, bulgeAmp: 1.2, diskAmp: 0.65, armAmp: 1.15, dust: 0.6, dustOff: 0.55, dustSharp: 2, hii: 2.8, core: [1, 0.9, 0.75], arm: [0.6, 0.75, 1], hiiCol: [1, 0.35, 0.55], incl: 0.2, roll: 0, phase: 0.9, fog: 0.25, comps: [] }
     ];
     function galaxyTexture(X, size, seed) {
       var cv = document.createElement('canvas'); cv.width = cv.height = size;
-      var cx = cv.getContext('2d'), id = cx.createImageData(size, size), d = id.data, tp = X.pitch;
+      var cx = cv.getContext('2d'), id = cx.createImageData(size, size), d = id.data, tp = X.pitch, isRing = X.kind === 'ring';
+      var ba = X.barAngle || 0, ca = Math.cos(ba), sa = Math.sin(ba), armIn = X.armIn === undefined ? 0.05 : X.armIn;
       for (var py = 0; py < size; py++) for (var px = 0; px < size; px++) {
         var x = (px + 0.5) / size * 2 - 1, y = (py + 0.5) / size * 2 - 1, r = Math.sqrt(x * x + y * y), o = (py * size + px) * 4, cr = 0, cg = 0, cb = 0;
         if (r < 1) {
-          var th = Math.atan2(y, x), ph = X.arms * (th - Math.log(r + 0.035) / tp) + X.phase;
-          var as = Math.pow(0.5 + 0.5 * Math.cos(ph), X.sharp), env = sstep(0.05, 0.38, r) * (1 - sstep(0.78, 1, r));
+          var th = Math.atan2(y, x);
           var n1 = fbm(x * 3.2 + seed, y * 3.2 + seed * 0.7, seed), n2 = fbm(x * 11 + seed * 2, y * 11 - seed, seed + 9);
-          var bulge = X.bulgeAmp * Math.exp(-Math.pow(r / X.bulgeR, 0.75) * 2.4), disk = X.diskAmp * Math.exp(-r / 0.33) * (0.75 + 0.5 * n1), old = bulge + disk;
-          var arms = as * env * (0.45 + 0.9 * n1) * X.armAmp;
-          var dw = Math.pow(0.5 + 0.5 * Math.cos(ph - X.dustOff), X.dustSharp);
-          var dust = Math.min(1, X.dust * dw * sstep(0.06, 0.32, r) * (1 - sstep(0.72, 1, r)) * (0.35 + 1.1 * n2));
-          var knots = Math.pow(as, 2.5) * env * sstep(0.6, 0.8, n2) * X.hii, blueK = as * env * sstep(0.58, 0.74, n1 + 0.1 * n2) * 0.9;
-          var fog = X.fog * Math.exp(-r / 0.55) * 0.32;
-          cr = X.core[0] * (old + fog) + X.arm[0] * (arms + blueK * 0.6) + X.hiiCol[0] * knots * 1.7;
-          cg = X.core[1] * (old + fog) + X.arm[1] * (arms + blueK * 0.6) + X.hiiCol[1] * knots * 1.7;
-          cb = X.core[2] * (old + fog) + X.arm[2] * (arms + blueK * 0.6) + X.hiiCol[2] * knots * 1.7;
-          var dk = 1 - dust * 0.8, fade = 1 - sstep(0.66, 1, r);
-          cr *= dk * fade; cg *= dk * fade * 0.97; cb *= dk * fade * 0.92;
+          if (isRing) {
+            var rg = Math.exp(-Math.pow((r - 0.58) / 0.055, 2)) * (0.55 + 0.9 * n1), rin = Math.exp(-Math.pow((r - 0.2) / 0.035, 2)) * (0.6 + 0.6 * n2);
+            var spk = Math.pow(0.5 + 0.5 * Math.cos(9 * th + 4 * n1), 3) * sstep(0.2, 0.32, r) * (1 - sstep(0.5, 0.57, r)) * 0.45;
+            var nuc = X.bulgeAmp * Math.exp(-Math.pow(r / X.bulgeR, 0.8) * 2.2), haze = 0.1 * Math.exp(-r / 0.4) * (0.7 + 0.5 * n1) * (1 - sstep(0.6, 0.66, r));
+            var oldR = nuc + rin * 0.9 + haze, armsR = rg * 1.4 + spk, knotR = rg * sstep(0.55, 0.75, n2) * X.hii * 1.8 + spk * 0.2, fadeR = 1 - sstep(0.78, 1, r);
+            cr = (X.core[0] * oldR + X.arm[0] * armsR + X.hiiCol[0] * knotR) * fadeR; cg = (X.core[1] * oldR + X.arm[1] * armsR + X.hiiCol[1] * knotR) * fadeR; cb = (X.core[2] * oldR + X.arm[2] * armsR + X.hiiCol[2] * knotR) * fadeR;
+          } else {
+            var ph = X.arms * (th - Math.log(r + 0.035) / tp) + X.phase;
+            var as = Math.pow(0.5 + 0.5 * Math.cos(ph), X.sharp), env = sstep(armIn, armIn + 0.33, r) * (1 - sstep(0.78, 1, r));
+            if (X.brk) as *= (1 - X.brk) + X.brk * sstep(0.35, 0.75, n2);
+            var bulge = X.bulgeAmp * Math.exp(-Math.pow(r / X.bulgeR, 0.75) * 2.4), disk = X.diskAmp * Math.exp(-r / 0.33) * (0.75 + 0.5 * n1), old = bulge + disk;
+            if (X.bar) { var xb = x * ca + y * sa, yb = -x * sa + y * ca; old += X.bar * Math.exp(-Math.pow(Math.abs(xb) / X.barLen, 3)) * Math.exp(-Math.pow(yb / (X.barLen * 0.2), 2)) * (0.8 + 0.4 * n1); }
+            var arms = as * env * (0.45 + 0.9 * n1) * X.armAmp;
+            var dw = Math.pow(0.5 + 0.5 * Math.cos(ph - X.dustOff), X.dustSharp);
+            var dust = X.dust * dw * sstep(0.06, 0.32, r) * (1 - sstep(0.72, 1, r)) * (0.35 + 1.1 * n2);
+            if (X.dustBand) dust += X.dustBand * Math.exp(-Math.pow((r - X.dustBandR) / X.dustBandW, 2)) * (0.6 + 0.8 * n2);
+            dust = Math.min(1, dust);
+            var knots = Math.pow(as, 2.5) * env * sstep(0.6, 0.8, n2) * X.hii, blueK = as * env * sstep(0.58, 0.74, n1 + 0.1 * n2) * 0.9;
+            var fog = X.fog * Math.exp(-r / 0.55) * 0.32;
+            cr = X.core[0] * (old + fog) + X.arm[0] * (arms + blueK * 0.6) + X.hiiCol[0] * knots * 1.7;
+            cg = X.core[1] * (old + fog) + X.arm[1] * (arms + blueK * 0.6) + X.hiiCol[1] * knots * 1.7;
+            cb = X.core[2] * (old + fog) + X.arm[2] * (arms + blueK * 0.6) + X.hiiCol[2] * knots * 1.7;
+            var dk = 1 - dust * (X.dustBand ? 0.97 : 0.8), fade = 1 - sstep(0.66, 1, r);
+            cr *= dk * fade; cg *= dk * fade * 0.97; cb *= dk * fade * 0.92;
+          }
           cr = 1 - Math.exp(-cr * 1.45); cg = 1 - Math.exp(-cg * 1.45); cb = 1 - Math.exp(-cb * 1.45);
         }
         d[o] = cr * 255; d[o + 1] = cg * 255; d[o + 2] = cb * 255; d[o + 3] = 255;
@@ -465,42 +495,106 @@
       var tex = new THREE.CanvasTexture(cv); tex.generateMipmaps = false; tex.minFilter = THREE.LinearFilter; tex.magFilter = THREE.LinearFilter; tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
       return tex;
     }
-    /* individual stars placed where the galaxy is bright, so zooming in reveals real star fields */
+    /* individual stars in true 3D: a round bulge, a thick disc that follows the arms (or the ring), a halo and star clusters */
     function galaxyStars(X, N, D, thick, dust) {
-      var n = 0, tries = 0;
+      var n = 0, tries = 0, isRing = X.kind === 'ring', armIn = X.armIn === undefined ? 0.05 : X.armIn, ba = X.barAngle || 0, ca = Math.cos(ba), sa = Math.sin(ba);
       while (n < N && tries < N * 60) {
         tries++;
-        var bulgeStar = R() < 0.28, r, th = R() * 6.2832;
-        if (bulgeStar) r = Math.abs((R() + R() + R() - 1.5)) * X.bulgeR * 2.2; else r = Math.min(0.98, -0.33 * Math.log(1 - R() * 0.97));
-        var ph = X.arms * (th - Math.log(r + 0.035) / X.pitch) + X.phase, as = Math.pow(0.5 + 0.5 * Math.cos(ph), X.sharp), env = sstep(0.05, 0.38, r) * (1 - sstep(0.78, 1, r));
-        var dens = bulgeStar ? 1 : 0.22 + 0.95 * as * env;
-        if (R() * 1.2 > dens) continue;
-        var col, size, u = R();
-        if (bulgeStar) col = [X.core[0] * (0.8 + 0.3 * R()), X.core[1] * (0.8 + 0.3 * R()), X.core[2] * (0.75 + 0.3 * R())];
-        else if (u < 0.06 * X.hii + 0.02 && as > 0.4) col = [X.hiiCol[0], X.hiiCol[1], X.hiiCol[2]];
-        else if (as * env > 0.25) col = mix(X.arm, [1, 1, 1], 0.35 + 0.4 * R());
-        else col = mix(X.core, [1, 0.95, 0.9], 0.3 + 0.4 * R());
-        size = R() < 0.03 ? 2.8 + R() * 2.2 : 0.7 + R() * 1.2;
-        dust.add(Math.cos(th) * r * D, Math.sin(th) * r * D, (R() + R() - 1) * thick * (0.35 + Math.exp(-r * 4) * 1.6), col, size, 0);
-        n++;
+        var col, size, r, th = R() * 6.2832, as = 0;
+        if (R() < (X.bulgeR > 0.2 ? 0.3 : 0.24)) {
+          var br = Math.abs(R() + R() + R() - 1.5) * X.bulgeR * 1.8 * D, a1 = R() * 6.2832, c1 = R() * 2 - 1, s1 = Math.sqrt(1 - c1 * c1);
+          col = [X.core[0] * (0.8 + 0.3 * R()), X.core[1] * (0.8 + 0.3 * R()), X.core[2] * (0.75 + 0.3 * R())];
+          dust.add(Math.cos(a1) * s1 * br, Math.sin(a1) * s1 * br, c1 * br * 0.85, col, R() < 0.03 ? 2.8 + R() * 2.2 : 0.7 + R() * 1.2, 0); n++; continue;
+        }
+        if (isRing) {
+          var pick = R();
+          if (pick < 0.6) r = 0.58 + (R() + R() + R() - 1.5) * 0.07; else if (pick < 0.75) r = 0.2 + (R() + R() - 1) * 0.05; else r = 0.2 + R() * 0.38;
+          if (pick >= 0.75 && R() > Math.pow(0.5 + 0.5 * Math.cos(9 * th), 3) + 0.15) continue;
+          col = pick < 0.6 ? (R() < 0.18 * X.hii ? X.hiiCol : mix(X.arm, [1, 1, 1], 0.3 + 0.4 * R())) : mix(X.core, [1, 0.95, 0.9], 0.3 + 0.4 * R());
+        } else {
+          r = Math.min(0.98, -0.33 * Math.log(1 - R() * 0.97));
+          var ph = X.arms * (th - Math.log(r + 0.035) / X.pitch) + X.phase, env = sstep(armIn, armIn + 0.33, r) * (1 - sstep(0.78, 1, r));
+          as = Math.pow(0.5 + 0.5 * Math.cos(ph), X.sharp);
+          var dens = 0.22 + 0.95 * as * env, barHere = 0;
+          if (X.bar) { var xb = Math.cos(th) * r * ca + Math.sin(th) * r * sa, yb = -Math.cos(th) * r * sa + Math.sin(th) * r * ca; barHere = Math.exp(-Math.pow(Math.abs(xb) / X.barLen, 3)) * Math.exp(-Math.pow(yb / (X.barLen * 0.2), 2)); dens += X.bar * barHere * 0.9; }
+          if (R() * 1.2 > dens) continue;
+          var u = R();
+          if (barHere > 0.3) col = mix(X.core, [1, 0.95, 0.85], 0.3 * R());
+          else if (u < 0.06 * X.hii + 0.02 && as > 0.4) col = [X.hiiCol[0], X.hiiCol[1], X.hiiCol[2]];
+          else if (as * env > 0.25) col = mix(X.arm, [1, 1, 1], 0.35 + 0.4 * R());
+          else col = mix(X.core, [1, 0.95, 0.9], 0.3 + 0.4 * R());
+        }
+        dust.add(Math.cos(th) * r * D, Math.sin(th) * r * D, (R() + R() - 1) * thick * (0.4 + Math.exp(-r * 3.5) * 1.5), col, R() < 0.03 ? 2.8 + R() * 2.2 : 0.7 + R() * 1.2, 0); n++;
       }
     }
+    function haloStars(X, N, D, dust) {
+      for (var k = 0; k < N; k++) {
+        var rr = D * (0.18 + 0.75 * Math.pow(R(), 1.6)), a1 = R() * 6.2832, c1 = R() * 2 - 1, s1 = Math.sqrt(1 - c1 * c1);
+        dust.add(Math.cos(a1) * s1 * rr, Math.sin(a1) * s1 * rr, c1 * rr * 0.8, mix(X.core, [0.8, 0.8, 0.9], 0.4 + 0.3 * R()), 0.6 + R() * 0.9, 0);
+      }
+      for (var g = 0; g < 7; g++) { /* globular clusters */
+        var gr = D * (0.4 + 0.45 * R()), ga = R() * 6.2832, gc = R() * 2 - 1, gs = Math.sqrt(1 - gc * gc), gx = Math.cos(ga) * gs * gr, gy = Math.sin(ga) * gs * gr, gz = gc * gr * 0.8;
+        for (var q = 0; q < 26; q++) dust.add(gx + (R() + R() - 1) * D * 0.025, gy + (R() + R() - 1) * D * 0.025, gz + (R() + R() - 1) * D * 0.025, [1, 0.9, 0.7], 0.8 + R() * 1.4, 0);
+      }
+    }
+    function plumeStars(N, D, dust) { /* gas streaming out above and below a starburst galaxy */
+      for (var k = 0; k < N; k++) {
+        var sg = R() < 0.5 ? -1 : 1, u = Math.pow(R(), 0.8), w = (0.03 + u * 0.14) * D;
+        dust.add((R() + R() + R() - 1.5) * w * 1.3, (R() + R() + R() - 1.5) * w * 0.5, sg * (0.06 + u * 0.85) * D, mix([1, 0.3, 0.35], [1, 0.72, 0.62], R() * (1 - u)), 1.1 + R() * 2.4, 0);
+      }
+    }
+    /* each galaxy dims and brightens through one gain value: planes and glows through their color, stars through a uniform */
+    function makeGainMat(gainU) {
+      return new THREE.ShaderMaterial({ uniforms: { uTime: tU, uPx: { value: DPR }, uAudio: audU, uGate: { value: 0 }, uGain: gainU },
+        vertexShader: DUST_VS.replace('uniform float uGate;', 'uniform float uGate; uniform float uGain;').replace('vA = a*tw*(0.85+uAudio*0.7);', 'vA = a*tw*(0.85+uAudio*0.7)*uGain;'),
+        fragmentShader: FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+    }
+    function applyGain(list, g, tint) {
+      var t0 = tint ? tint[0] : 1, t1 = tint ? tint[1] : 1, t2 = tint ? tint[2] : 1;
+      for (var q = 0; q < list.length; q++) list[q].m.color.setRGB(list[q].b[0] * g * t0, list[q].b[1] * g * t1, list[q].b[2] * g * t2);
+    }
+    /* a stack of translucent discs gives real depth: they separate as you orbit, like a thick spiral disc */
+    function addLayers(spin, tex, D, count, halfT, gl) {
+      var ws = [], sum = 0, k, tt;
+      for (k = 0; k < count; k++) { tt = count === 1 ? 0 : (k / (count - 1)) * 2 - 1; ws.push(Math.exp(-tt * tt * 1.5)); sum += ws[k]; }
+      for (k = 0; k < count; k++) {
+        tt = count === 1 ? 0 : (k / (count - 1)) * 2 - 1;
+        var m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }), kk = 1.1 * ws[k] / sum;
+        gl.push({ m: m, b: [kk, kk, kk] });
+        var pl = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), m); pl.scale.setScalar(D * (1 - 0.04 * Math.abs(tt))); pl.position.z = tt * halfT; pl.rotation.z = tt * 0.035; spin.add(pl);
+      }
+    }
+    function addGlows(spin, X, D, gl, bulgeOpacity) {
+      var bm = new THREE.SpriteMaterial({ map: glowTex, color: 0xffffff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+      gl.push({ m: bm, b: [X.core[0] * bulgeOpacity, X.core[1] * bulgeOpacity, X.core[2] * bulgeOpacity] });
+      var bs = new THREE.Sprite(bm); bs.scale.setScalar(D * (X.bulgeR * 3 + 0.3)); spin.add(bs);
+      if (X.plume) [-1, 1].forEach(function (sg) { var pm = new THREE.SpriteMaterial({ map: glowTex, color: 0xffffff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }); gl.push({ m: pm, b: [0.34, 0.09, 0.12] }); var ps = new THREE.Sprite(pm); ps.position.set(0, 0, sg * D * 0.38); ps.scale.setScalar(D * 0.55); spin.add(ps); });
+      X.comps.forEach(function (c) {
+        var cm = new THREE.SpriteMaterial({ map: glowTex, color: 0xffffff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+        gl.push({ m: cm, b: [c.col[0] * 0.85, c.col[1] * 0.85, c.col[2] * 0.85] });
+        var cs = new THREE.Sprite(cm); cs.position.set(c.x * D, c.y * D, 0); cs.scale.setScalar(c.s * D * 1.6); spin.add(cs);
+      });
+    }
     function addPlanet(i, parent, pos, radius) {
-      var P = PLN[i], X = GX[i];
+      var P = PLN[i], X = GX[i], gainU = { value: 1 }, gl = [];
       var grp = new THREE.Group(); grp.position.copy(pos); parent.add(grp); parent.updateMatrixWorld(true); grp.lookAt(0, 3, 13);
-      var DISC = radius * 1.75;
+      var DISC = radius * 1.75, halfT = DISC * 0.07;
       var tiltG = new THREE.Group(); tiltG.rotation.set(X.incl, 0, X.roll, 'ZXY'); grp.add(tiltG);
       var spin = new THREE.Group(); tiltG.add(spin);
-      var mat = new THREE.MeshBasicMaterial({ map: galaxyTexture(X, phone ? 192 : 256, i * 7.3 + 1), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
-      var plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); plane.scale.setScalar(DISC); spin.add(plane);
-      X.comps.forEach(function (c) { var cs = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: new THREE.Color(c.col[0], c.col[1], c.col[2]), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.85 })); cs.position.set(c.x * DISC, c.y * DISC, 0); cs.scale.setScalar(c.s * DISC * 1.6); spin.add(cs); });
-      var sd = new Dust(); galaxyStars(X, phone ? 520 : 900, DISC, DISC * 0.05, sd); spin.add(sd.build());
+      addLayers(spin, galaxyTexture(X, phone ? 192 : 256, i * 7.3 + 1), DISC, phone ? 2 : 3, halfT, gl);
+      addGlows(spin, X, DISC, gl, 0.4);
+      var sd = new Dust(); galaxyStars(X, phone ? 520 : 900, DISC, halfT * 1.4, sd); haloStars(X, phone ? 140 : 260, DISC, sd); if (X.plume) plumeStars(phone ? 420 : 800, DISC, sd);
+      spin.add(sd.build(makeGainMat(gainU)));
       var halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: new THREE.Color(P.a), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.35 }));
       halo.scale.setScalar(radius * 3.8); grp.add(halo);
       var mark = new THREE.Sprite(new THREE.SpriteMaterial({ map: ringTex, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, opacity: 0 }));
       mark.scale.setScalar(radius * 3.4); grp.add(mark);
-      var lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.innerHTML = '<b></b><span class="mono">' + SCENES[i].short + '</span>'; labelsEl.appendChild(lbl);
-      var L = { i: i, grp: grp, mesh: tiltG, spin: spin, mat: mat, halo: halo, mark: mark, lbl: lbl, r: DISC * 0.8, ph: R() * 6.28, hover: 0, sx: 0, sy: 0, rpx: 30, vis: false, depth: 0, dir: pos.clone().normalize() };
+      var lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.innerHTML = '<b></b><span class="mono">' + SCENES[i].short + '</span><span class="mono real">' + REAL[i].name + '</span>'; labelsEl.appendChild(lbl);
+      var L = { i: i, grp: grp, mesh: tiltG, spin: spin, gl: gl, gainU: gainU, halo: halo, mark: mark, lbl: lbl, link: null, r: DISC * 0.8, ph: R() * 6.28, hover: 0, sx: 0, sy: 0, rpx: 30, vis: false, depth: 0, dir: pos.clone().normalize() };
+      if (i !== HOLY) { /* a thread of light from the robed figure, shown once this galaxy has been visited */
+        var ld = new Dust(); for (var q = 1; q < 40; q++) { var f = q / 40; ld.add(pos.x * f, 0.7 + (pos.y - 0.7) * f, pos.z * f, mix(GOLD, DIM, 0.25), 1.1, 0); }
+        L.link = ld.build(); L.link.visible = false; parent.add(L.link);
+      }
       lights.push(L); return L;
     }
     for (var pi = 0; pi < 8; pi++) {
@@ -508,6 +602,14 @@
       addPlanet(pi, orbit, new THREE.Vector3(Math.cos(th) * rad, yy, Math.sin(th) * rad).multiplyScalar(RP), (0.52 + 0.07 * Math.sin(pi * 2.1)) * (phone ? 0.82 : 1));
     }
     addPlanet(HOLY, gateGroup, new THREE.Vector3(0, 3.1, 0), phone ? 0.6 : 0.7);
+    /* the robed figure is the source of light: a warm glow, and a beam of power that flows into a galaxy you choose */
+    var fglow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffe2a8, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.3 }));
+    fglow.scale.setScalar(phone ? 7 : 8.5); fglow.position.set(0, 0.5, -0.5); scene.add(fglow);
+    var BN = 160, beamGeo = new THREE.BufferGeometry(), beamOff = [], beamSrc = new THREE.Vector3(0, 0.9, 0.25);
+    beamGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(BN * 3), 3));
+    for (var bq = 0; bq < BN; bq++) beamOff.push(0.15 + R() * 0.5);
+    var beam = new THREE.Points(beamGeo, new THREE.PointsMaterial({ size: 0.22, map: glowTex, color: 0xffd27d, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+    beam.frustumCulled = false; beam.visible = false; scene.add(beam);
 
     /* globe lattice: great circles and dots so the turning sphere reads in 3D */
     var lat = new Dust(), li;
@@ -535,21 +637,23 @@
     var galaxies = {}, curG = -1;
     var SPIKE = (function () { var c = document.createElement('canvas'); c.width = c.height = 128; var x = c.getContext('2d'); var g = x.createRadialGradient(64, 64, 0, 64, 64, 22); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); [[0, 1], [1, 0]].forEach(function (a) { var l = x.createLinearGradient(64 - a[0] * 64, 64 - a[1] * 64, 64 + a[0] * 64, 64 + a[1] * 64); l.addColorStop(0, 'rgba(255,255,255,0)'); l.addColorStop(0.5, 'rgba(255,255,255,0.9)'); l.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = l; x.fillRect(a[1] ? 0 : 62, a[0] ? 0 : 62, a[1] ? 128 : 4, a[0] ? 128 : 4); }); return new THREE.CanvasTexture(c); })();
     function buildGalaxy(i) {
-      var P = PLN[i], X = GX[i], DI = 7.2;
+      var P = PLN[i], X = GX[i], DI = 7.2, gainU = { value: 0.2 }, gl = [];
       var grp = new THREE.Group(); grp.visible = false; gScene.add(grp);
       var tiltG = new THREE.Group(); tiltG.rotation.set(X.incl, 0, X.roll, 'ZXY'); grp.add(tiltG);
       var spin = new THREE.Group(); tiltG.add(spin);
-      var plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ map: galaxyTexture(X, phone ? 512 : 768, i * 7.3 + 1), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
-      plane.scale.setScalar(DI); spin.add(plane);
-      X.comps.forEach(function (c) { var cs = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: new THREE.Color(c.col[0], c.col[1], c.col[2]), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.9 })); cs.position.set(c.x * DI, c.y * DI, 0); cs.scale.setScalar(c.s * DI * 1.5); spin.add(cs); });
-      var sd = new Dust(); galaxyStars(X, phone ? 5500 : 11000, DI, DI * 0.045, sd); spin.add(sd.build());
+      var halfT = DI * 0.05;
+      addLayers(spin, galaxyTexture(X, phone ? 512 : 768, i * 7.3 + 1), DI, phone ? 6 : 9, halfT, gl);
+      addGlows(spin, X, DI, gl, 0.5);
+      var sd = new Dust(); galaxyStars(X, phone ? 5500 : 11000, DI, halfT * 2.0, sd); haloStars(X, phone ? 900 : 1800, DI, sd); if (X.plume) plumeStars(phone ? 3500 : 7000, DI, sd);
+      spin.add(sd.build(makeGainMat(gainU)));
       /* distant field stars with diffraction spikes, like a telescope image */
       var STAR_COLS = [[1, 0.95, 0.8], [0.72, 0.82, 1], [1, 0.72, 0.62], [0.88, 1, 0.9], [1, 0.82, 0.95]];
       var field = new Dust();
       for (var fs = 0; fs < 1100 * sc; fs++) { var v = new THREE.Vector3(R() - 0.5, R() - 0.5, R() - 0.5).normalize().multiplyScalar(16 + R() * 14); field.add(v.x, v.y, v.z, STAR_COLS[(R() * 5) | 0], 0.7 + R() * 1.6, 0); }
       grp.add(field.build());
       for (var fl = 0; fl < (phone ? 14 : 24); fl++) { var cc = STAR_COLS[(R() * 5) | 0], v2 = new THREE.Vector3(R() - 0.5, (R() - 0.5) * 0.7, R() - 0.5).normalize().multiplyScalar(9 + R() * 14), sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: SPIKE, color: new THREE.Color(cc[0], cc[1], cc[2]), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.45 + R() * 0.4 })); sp.position.copy(v2); sp.scale.setScalar(0.35 + R() * 0.75); grp.add(sp); }
-      return (galaxies[i] = { grp: grp, tiltG: tiltG, spin: spin, DI: DI, pal: [hex(P.a), hex(P.b), [1, 1, 1], hex('#ffe9b0')] });
+      var wave = new THREE.Sprite(new THREE.SpriteMaterial({ map: ringTex, color: 0xffe2a8, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 })); grp.add(wave);
+      return (galaxies[i] = { grp: grp, tiltG: tiltG, spin: spin, DI: DI, gl: gl, gainU: gainU, gain: 0.2, wave: wave, waveT: 0, pal: [hex(P.a), hex(P.b), [1, 1, 1], hex('#ffe9b0')] });
     }
     function getGalaxy(i) { return galaxies[i] || buildGalaxy(i); }
 
@@ -607,11 +711,11 @@
     function showGalaxy(i) {
       curG = i; mode = 'galaxy';
       Object.keys(galaxies).forEach(function (k) { galaxies[k].grp.visible = false; });
-      var G = getGalaxy(i); G.grp.visible = true; setWarp(i);
+      var G = getGalaxy(i); G.grp.visible = true; setWarp(i); G.gain = reduce ? 1 : 0.18; G.waveT = performance.now();
       var first = markFound(i); selected = i; openPanel('scene', i); paintLight(lights[i]); labelsEl.style.display = 'none';
       gAz = 0; gEl = 0.12; gZoomT = gZoom = 1; gFocusOn = false; gGoal.set(0, 0, 0); gTarget.set(0, 0, 0);
       hintEl.textContent = galaxyHint; hintEl.classList.remove('gone'); clearTimeout(showGalaxy.h); showGalaxy.h = setTimeout(function () { hintEl.classList.add('gone'); }, 7000);
-      if (first) { FWg.burst(0, 2.2, 0, 1.3, PAL_COVER, !!SCENES[i].lift); try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {} toast(SCENES[i].holy ? 'You are in the Holy Place' : 'Galaxy found'); }
+      if (first) { FWg.burst(0, 2.2, 0, 1.3, PAL_COVER, !!SCENES[i].lift); try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {} toast(SCENES[i].holy ? 'You are in the Holy Place' : 'The light fills this galaxy'); }
       else toast(SCENES[i].short);
     }
     function showCosmos() { mode = 'cosmos'; hintEl.textContent = cosmosHint; hintEl.classList.add('gone'); labelsEl.style.display = ''; if (curG >= 0 && galaxies[curG]) galaxies[curG].grp.visible = false; }
@@ -714,6 +818,7 @@
       audioE += (e - audioE) * 0.25; audU.value = audioE;
       if (mode === 'galaxy' && nowMs - lastG > 2800 && !reduce) { lastG = nowMs; FWg.burst((R() - 0.5) * 8, 0.8 + R() * 4, (R() - 0.5) * 5, 1.0, galaxies[curG].pal, !!SCENES[curG].lift); }
 
+      var trS = (tr && tr.type === 'enter' && !tr.sw) ? (nowMs - tr.t0) / 1000 : -1;
       /* transitions */
       if (tr) {
         var s = (nowMs - tr.t0) / 1000;
@@ -741,7 +846,12 @@
         gZoom += (gZoomT - gZoom) * Math.min(1, dt * 4);
         var Gg = galaxies[curG];
         gTarget.lerp(gGoal, Math.min(1, dt * 4));
-        if (Gg) Gg.spin.rotation.z += dt * 0.012;
+        if (Gg) {
+          Gg.spin.rotation.z += dt * 0.012;
+          Gg.gain += (1 - Gg.gain) * Math.min(1, dt * 1.3); applyGain(Gg.gl, Gg.gain); Gg.gainU.value = Gg.gain;
+          var wt = (nowMs - Gg.waveT) / 1800;
+          if (wt >= 0 && wt < 1) { Gg.wave.material.opacity = (1 - wt) * 0.7; Gg.wave.scale.setScalar(1 + wt * 34); } else Gg.wave.material.opacity = 0;
+        }
         var d2 = gDist * gZoom;
         camera.position.set(gTarget.x + Math.sin(gAz) * Math.cos(gEl) * d2, gTarget.y + Math.sin(gEl) * d2, gTarget.z + Math.cos(gAz) * Math.cos(gEl) * d2);
         camera.up.set(0, 1, 0); camera.lookAt(gTarget);
@@ -786,6 +896,9 @@
       figU.uAssemble.value = reduce ? 1 : Math.min(1, (nowMs - assemble0) / 3600);
       var bt = t - burstT; figU.uBurst.value = bt < 0 ? 0 : (bt < 0.3 ? bt / 0.3 : Math.exp(-(bt - 0.3) * 1.5)) * (bt < 6 ? 1 : 0);
       dustU.uGate.value += (gateT - dustU.uGate.value) * Math.min(1, dt * 1.2);
+      var figPulse = trS >= 0 ? ease(trS / 0.35) * (1 - ease((trS - 0.6) / 0.35)) : 0;
+      figU.uBright.value = 1.75 + 0.9 * figPulse + audioE * 0.4;
+      fglow.material.opacity = 0.3 + 0.4 * figPulse + audioE * 0.3;
       var pp = 0;
       if (pointerIn && entered && !tr && !dragging) {
         plane.normal.copy(camera.position).sub(curTarget).normalize(); plane.constant = -plane.normal.dot(v3.set(0, 0, 0));
@@ -805,8 +918,11 @@
         var pulse = 1 + 0.035 * Math.sin(t * 2 + L.ph);
         var sc2 = pulse * (1 + L.hover * 0.16) * (1 + audioE * 0.1);
         L.mesh.scale.setScalar(sc2);
-        L.halo.material.opacity = ((sealed ? 0.35 : 0.6 + 0.25 * L.hover) + audioE * 0.4); L.halo.scale.setScalar(L.r * (sealed ? 3.4 : 4.6) * sc2);
-        var gain = (isF ? 1.25 : 1.0) + L.hover * 0.4; if (sealed) L.mat.color.setRGB(0.4, 0.46, 0.7); else L.mat.color.setRGB(gain, gain, gain);
+        L.halo.material.opacity = (sealed ? 0.2 : 0.14 + 0.3 * Math.min(gain, 1.5)) + audioE * 0.2; L.halo.scale.setScalar(L.r * (sealed ? 3.4 : 4.6) * sc2);
+        var gain = (sealed ? 0.42 : (holy ? 1.5 : (isF ? 1.25 : 0.5))) + L.hover * 0.4 + audioE * 0.25;
+        if (trS >= 0 && tr.i === L.i) gain += ease(trS / 0.9) * 0.9;
+        L.gainU.value = gain; applyGain(L.gl, gain, sealed ? [0.62, 0.72, 1] : null);
+        if (L.link) L.link.visible = !!isF;
         L.mark.scale.setScalar(L.r * 3.1 * sc2);
         if (!L.lbl._init) { paintLight(L); L.lbl._init = true; }
         if (phone && L.vis && !hasPanel && !tr) { var cdx = L.sx - W / 2, cdy = L.sy - H * 0.5, dd = cdx * cdx + cdy * cdy; if (dd < md && dd < 170 * 170) { md = dd; magnet = i; } }
@@ -819,6 +935,14 @@
         Lj.lbl.style.display = (Lj.vis && !tr) ? '' : 'none';
         Lj.lbl.classList.toggle('on', on && Lj.vis); Lj.lbl.classList.toggle('back', behind);
       }
+      if (trS >= 0 && lights[tr.i]) {
+        worldOf(lights[tr.i], v4); var bp = beamGeo.attributes.position.array;
+        for (var bk = 0; bk < BN; bk++) {
+          var bu = (trS * 1.6 + bk / BN) % 1, eu = bu * bu * (3 - 2 * bu), wob = Math.sin(bu * 3.1416) * beamOff[bk];
+          bp[bk * 3] = beamSrc.x + (v4.x - beamSrc.x) * eu + wob * Math.cos(bk); bp[bk * 3 + 1] = beamSrc.y + (v4.y - beamSrc.y) * eu + wob * Math.sin(bk * 1.7); bp[bk * 3 + 2] = beamSrc.z + (v4.z - beamSrc.z) * eu + wob * Math.cos(bk * 2.3);
+        }
+        beamGeo.attributes.position.needsUpdate = true; beam.visible = true; beam.material.opacity = Math.min(1, trS * 3) * (1 - ease((trS - 0.8) / 0.15));
+      } else beam.visible = false;
       renderer.render(scene, camera);
     }
     requestAnimationFrame(frame);
