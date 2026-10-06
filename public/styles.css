@@ -30,14 +30,12 @@ em { font-style: italic; color: var(--gold); }
 
 /* labels over lights */
 #labels { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
-.lbl { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); white-space: nowrap; opacity: 0.95; transition: opacity .25s ease; text-align: center; text-shadow: 0 0 5px #000, 0 0 12px #000, 0 0 22px #000, 0 1px 2px #000; }
-.lbl b { display: block; font: 400 1.25rem/1.1 var(--f-display); font-style: italic; color: var(--gold); }
+.lbl { position: absolute; left: 0; top: 0; will-change: transform; white-space: nowrap; opacity: 0.85; transition: opacity .3s ease; text-align: center; text-shadow: 0 0 5px #000, 0 0 12px #000, 0 0 22px #000, 0 1px 2px #000; }
+.lbl b { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 3px; font: 400 1.25rem/1.1 var(--f-display); font-style: italic; color: var(--gold); opacity: 0; transition: opacity .3s ease; }
 .lbl span { display: block; color: #fff3da; font-size: 0.78rem; font-weight: 500; }
-.lbl .real { display: none; color: var(--gold); font-size: 0.7rem; margin-top: 1px; }
-.lbl.on .real { display: block; }
-.lbl b:empty { display: none; }
+.lbl .real { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); color: var(--gold); font-size: 0.7rem; margin-top: 1px; opacity: 0; transition: opacity .3s ease; }
+.lbl.on .real, .lbl.on b { opacity: 1; }
 .lbl.on { opacity: 1; }
-.lbl:not(.on) b { display: none; }
 .lbl.found { opacity: 1; }
 .lbl.found.on { opacity: 1; }
 
@@ -121,7 +119,8 @@ details summary { cursor: pointer; color: var(--gold); margin-top: 14px; }
 
 /* galaxy warp, planet labels, galaxy navigation */
 .warp { position: fixed; inset: 0; z-index: 35; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 50%, var(--w1, #fff4d6) 0%, var(--w2, #ff8a3d) 38%, #05060c 88%); }
-.lbl.back { opacity: 0.7; }
+.lbl.back { opacity: 0.55; }
+.mode-phone .lbl.back { opacity: 0; }
 .gnav { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 6px; }
 .gnav .btn { padding: 12px 16px; font-size: 0.85rem; }
 

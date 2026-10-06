@@ -241,7 +241,7 @@
     var renderer;
     try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false, powerPreference: 'high-performance' }); }
     catch (e) { fallbackMode(); return; }
-    var DPR = Math.min(window.devicePixelRatio || 1, phone ? 1.6 : 2);
+    var DPR = Math.min(window.devicePixelRatio || 1, phone ? 1.5 : 2);
     renderer.setPixelRatio(DPR); renderer.setClearColor(0x05060c, 1);
     var scene = new THREE.Scene(), gScene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 120);
@@ -345,17 +345,18 @@
       '  vec3 dir = normalize(p-uBurstC+(aR-0.5)*0.9);',
       '  p += dir*uBurst*(0.5+aR.z*2.4)*(aFace>0.5?2.2:0.8);',
       '  float tw = 0.8+0.2*sin(t*2.0+aR.x*40.0);',
-      '  vColor = aColor*uBright*(1.0+uAudio*0.5+uBurst*0.6); vA = (0.8-aFace*0.1)*tw*(0.3+0.7*d);',
+      '  vColor = aColor*(aFace>0.5?1.0:uBright)*(1.0+uAudio*0.4+uBurst*0.6); vA = (0.8-aFace*0.1)*tw*(0.3+0.7*d);',
       '  vec4 mv = modelViewMatrix*vec4(p,1.0);',
-      '  gl_PointSize = min((aFace>0.5?3.3:2.9)*uPhone*(0.75+aR.y*0.9)*uPx*(9.0/-mv.z)*(1.0+uAudio*0.5+uBurst*0.6), 14.0*uPx);',
+      '  gl_PointSize = min((aFace>0.5?2.6:2.5)*uPhone*(0.75+aR.y*0.9)*uPx*(9.0/-mv.z)*(1.0+uAudio*0.4+uBurst*0.6), 9.0*uPx);',
       '  gl_Position = projectionMatrix*mv;',
       '}'
     ].join('\n');
-    var figU = { uBright: { value: 1.75 }, uPhone: { value: phone ? 1.3 : 1 }, uTime: tU, uPx: { value: DPR }, uAudio: audU, uAssemble: { value: 0 }, uBurst: { value: 0 }, uPointPow: { value: 0 }, uBurstC: { value: new THREE.Vector3(0.08, 1.26, 0.2) }, uPointer: { value: new THREE.Vector3(99, 99, 99) } };
+    var figU = { uBright: { value: 1.7 }, uPhone: { value: phone ? 1.55 : 1.1 }, uTime: tU, uPx: { value: DPR }, uAudio: audU, uAssemble: { value: 0 }, uBurst: { value: 0 }, uPointPow: { value: 0 }, uBurstC: { value: new THREE.Vector3(0.08, 1.26, 0.2) }, uPointer: { value: new THREE.Vector3(99, 99, 99) } };
     (function () {
       var N = 200, cv = document.createElement('canvas'); cv.width = cv.height = N;
       var cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, N, N);
       var data = cx.getImageData(0, 0, N, N).data;
+      var SPILL = [[1, 0.3, 0.7], [0.75, 0.35, 1], [1, 0.85, 0.2], [0.35, 0.95, 0.45], [1, 0.5, 0.2]];
       var pos = [], col = [], face = [], rr = [];
       for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
         var i = (y * N + x) * 4, r = data[i] / 255, g = data[i + 1] / 255, b = data[i + 2] / 255;
@@ -363,16 +364,21 @@
         if (lum < 0.1 && sat < 0.25) continue;
         var isFace = (sat > 0.3 && lum > 0.2) || (y / N < 0.34 && x / N > 0.33 && x / N < 0.7 && lum > 0.5);
         var vein = isFace && sat <= 0.3;
-        var reps = isFace ? 2 : (phone ? 2 : 3);
+        var reps = isFace ? 2 : 2;
         for (var k2 = 0; k2 < reps; k2++) {
           pos.push(((x + R()) / N - 0.5) * FIG, (0.5 - (y + R()) / N) * FIG, (lum - 0.4) * 0.4 + (isFace ? (R() - 0.5) * 0.7 + 0.2 : (R() - 0.5) * 0.85));
           if (isFace) {
             /* keep the album's own colors: normalise, push saturation, never boost toward white */
-            var cm = Math.max(mx, 0.001), sr = r / cm, sg = g / cm, sb = b / cm, lm = 0.3 * sr + 0.59 * sg + 0.11 * sb, br = vein ? 0.5 : Math.min(0.66 + mx * 0.45, 1.0);
-            var cr = Math.max(0, Math.min(1, lm + (sr - lm) * 1.55)), cg = Math.max(0, Math.min(1, lm + (sg - lm) * 1.55)), cb2 = Math.max(0, Math.min(1, lm + (sb - lm) * 1.55));
+            var cm = Math.max(mx, 0.001), sr = r / cm, sg = g / cm, sb = b / cm, lm = 0.3 * sr + 0.59 * sg + 0.11 * sb, br = vein ? 0.5 : Math.min(0.6 + mx * 0.35, 0.92);
+            var cr = Math.max(0, Math.min(1, lm + (sr - lm) * 1.95)), cg = Math.max(0, Math.min(1, lm + (sg - lm) * 1.95)), cb2 = Math.max(0, Math.min(1, lm + (sb - lm) * 1.95));
             if (vein) { cr = 1; cg = 0.78; cb2 = 0.95; }
             col.push(cr * br, cg * br, cb2 * br);
-          } else col.push(Math.min(lum * 1.3, 1.1), Math.min(lum * 1.2, 1.0), Math.min(lum * 1.0, 0.9));
+          } else {
+            /* the robe glows with color instead of white: amber at the hem, and the face's pinks, violets and greens spill into it */
+            var fx = x / N - 0.5, fy = y / N - 0.2, spill = Math.max(0, 1 - Math.sqrt(fx * fx + fy * fy) * 1.5), lv = Math.min(1, lum * 1.15), pickC = SPILL[(R() * SPILL.length) | 0];
+            var base = [1.0, 0.5 + 0.2 * (1 - y / N), 0.14], mixA = Math.min(0.85, spill * 0.9 * (0.5 + 0.6 * R()));
+            col.push((base[0] + (pickC[0] - base[0]) * mixA) * lv, (base[1] + (pickC[1] - base[1]) * mixA) * lv, (base[2] + (pickC[2] - base[2]) * mixA) * lv);
+          }
           face.push(isFace ? 1 : 0); rr.push(R(), R(), R());
         }
       }
@@ -589,7 +595,7 @@
       halo.scale.setScalar(radius * 3.8); grp.add(halo);
       var mark = new THREE.Sprite(new THREE.SpriteMaterial({ map: ringTex, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, opacity: 0 }));
       mark.scale.setScalar(radius * 3.4); grp.add(mark);
-      var lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.innerHTML = '<b></b><span class="mono">' + SCENES[i].short + '</span><span class="mono real">' + REAL[i].name + '</span>'; labelsEl.appendChild(lbl);
+      var lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.innerHTML = '<b></b><span class="mono nm">' + SCENES[i].short + '</span><span class="mono real">' + REAL[i].name + '</span>'; labelsEl.appendChild(lbl);
       var L = { i: i, grp: grp, mesh: tiltG, spin: spin, gl: gl, gainU: gainU, halo: halo, mark: mark, lbl: lbl, link: null, r: DISC * 0.8, ph: R() * 6.28, hover: 0, sx: 0, sy: 0, rpx: 30, vis: false, depth: 0, dir: pos.clone().normalize() };
       if (i !== HOLY) { /* a thread of light from the robed figure, shown once this galaxy has been visited */
         var ld = new Dust(); for (var q = 1; q < 40; q++) { var f = q / 40; ld.add(pos.x * f, 0.7 + (pos.y - 0.7) * f, pos.z * f, mix(GOLD, DIM, 0.25), 1.1, 0); }
@@ -797,11 +803,11 @@
     });
 
     /* ---------- Frame loop ---------- */
-    var t0 = performance.now(), last = t0, assemble0 = t0, gateT = 0, burstT = -1e9, warpA = 0, lastG = 0;
+    var dtSm = 0.016, magKeep = -1, t0 = performance.now(), last = t0, assemble0 = t0, gateT = 0, burstT = -1e9, warpA = 0, lastG = 0;
     function frame(nowMs) {
       requestAnimationFrame(frame);
       if (document.hidden) return;
-      var dt = Math.min((nowMs - last) / 1000, 0.05); last = nowMs; var t = (nowMs - t0) / 1000; tU.value = t;
+      var dt = Math.min((nowMs - last) / 1000, 0.05); last = nowMs; dtSm += (dt - dtSm) * 0.2; dt = dtSm; var t = (nowMs - t0) / 1000; tU.value = t;
       var hasPanel = panelKind !== null;
 
       /* audio */
@@ -897,8 +903,8 @@
       var bt = t - burstT; figU.uBurst.value = bt < 0 ? 0 : (bt < 0.3 ? bt / 0.3 : Math.exp(-(bt - 0.3) * 1.5)) * (bt < 6 ? 1 : 0);
       dustU.uGate.value += (gateT - dustU.uGate.value) * Math.min(1, dt * 1.2);
       var figPulse = trS >= 0 ? ease(trS / 0.35) * (1 - ease((trS - 0.6) / 0.35)) : 0;
-      figU.uBright.value = 1.75 + 0.9 * figPulse + audioE * 0.4;
-      fglow.material.opacity = 0.3 + 0.4 * figPulse + audioE * 0.3;
+      figU.uBright.value = 1.7 + 0.9 * figPulse + audioE * 0.4;
+      fglow.material.opacity = 0.24 + 0.35 * figPulse + audioE * 0.25;
       var pp = 0;
       if (pointerIn && entered && !tr && !dragging) {
         plane.normal.copy(camera.position).sub(curTarget).normalize(); plane.constant = -plane.normal.dot(v3.set(0, 0, 0));
@@ -925,14 +931,17 @@
         if (L.link) L.link.visible = !!isF;
         L.mark.scale.setScalar(L.r * 3.1 * sc2);
         if (!L.lbl._init) { paintLight(L); L.lbl._init = true; }
-        if (phone && L.vis && !hasPanel && !tr) { var cdx = L.sx - W / 2, cdy = L.sy - H * 0.5, dd = cdx * cdx + cdy * cdy; if (dd < md && dd < 170 * 170) { md = dd; magnet = i; } }
+        if (phone && L.vis && !hasPanel && !tr) { var cdx = L.sx - W / 2, cdy = L.sy - H * 0.5, dd = cdx * cdx + cdy * cdy; L.dd = dd; if (dd < md && dd < 170 * 170) { md = dd; magnet = i; } }
       }
-      /* the planet nearest the camera side sits in front; dim labels on the far side of the figure */
+      if (magKeep >= 0 && magnet !== magKeep && lights[magKeep].vis && lights[magKeep].dd < md * 1.6 && lights[magKeep].dd < 170 * 170 && !hasPanel && !tr) magnet = magKeep; /* hold the current label until another is clearly closer */
+      magKeep = magnet;
       for (var j = 0; j < lights.length; j++) {
         var Lj = lights[j]; var on = phone ? (j === magnet || (j === selected && !tr)) : (j === hoverIdx || (j === selected && !tr));
-        Lj.lbl.style.left = Lj.sx + 'px'; Lj.lbl.style.top = (Lj.sy - Lj.rpx * 0.9) + 'px';
+        var tx = Lj.sx, ty = Lj.sy - Lj.rpx * 0.9;
+        if (Lj.lx === undefined || !Lj.lshow) { Lj.lx = tx; Lj.ly = ty; } else { var lk = Math.min(1, dt * 10); Lj.lx += (tx - Lj.lx) * lk; Lj.ly += (ty - Lj.ly) * lk; }
+        Lj.lbl.style.transform = 'translate3d(' + Lj.lx.toFixed(1) + 'px,' + Lj.ly.toFixed(1) + 'px,0) translate(-50%,-100%)';
         v3.setFromMatrixPosition(Lj.grp.matrixWorld); var behind = v3.distanceTo(camera.position) > camera.position.distanceTo(curTarget) + 0.8;
-        Lj.lbl.style.display = (Lj.vis && !tr) ? '' : 'none';
+        Lj.lshow = Lj.vis && !tr; Lj.lbl.style.visibility = Lj.lshow ? 'visible' : 'hidden';
         Lj.lbl.classList.toggle('on', on && Lj.vis); Lj.lbl.classList.toggle('back', behind);
       }
       if (trS >= 0 && lights[tr.i]) {
