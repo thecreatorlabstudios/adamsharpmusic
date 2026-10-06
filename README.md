@@ -2,7 +2,6 @@
 Status: DRAFT for Joshua's review. Not yet approved by Adam. Not hosted anywhere yet.
 Preview (private artifact): https://claude.ai/artifact/Cnj932bVVsAkq5qx37v999
 The site lives in `public/` (`index.html`, `styles.css`, `app.js`, `assets/`, `vendor/three.r128.min.js` self-hosted, `login.html`). `middleware.js` and `api/` are the login for Vercel. See `DEPLOY.md` (Vercel + Hostinger domain). `npm run dev` runs a local copy of Vercel's request flow, `npm test` runs the login checks.
-`python3 -I build-preview.py OUT.html` bundles everything into one file for review.
 
 ## The experience
 - One full-screen night world. The Fireworks cover (Drive `Artist Photos/IMG_0004.png`, resized to `assets/cover.jpg`) is rebuilt as a floating cloud of light, sampled from its own pixels. It reacts to the pointer and to the promo audio.
