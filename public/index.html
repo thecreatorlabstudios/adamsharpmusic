@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Adam Sharp: Fireworks</title>
+<meta name="description" content="Adam Sharp is a worship artist. Step into the world of his new single Fireworks, out November 22, 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-review="true">
+
+<canvas id="gl" aria-hidden="true"></canvas>
+<div id="labels" aria-hidden="true"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<header class="hud" id="hud">
+  <a class="brand" href="#" id="brand">Adam Sharp</a>
+  <nav class="nav" id="nav" aria-label="Main">
+    <button type="button" data-open="explore" aria-current="page">Explore</button>
+    <button type="button" data-open="story">Story</button>
+    <button type="button" data-open="release">Release</button>
+    <button type="button" data-open="connect">Connect</button>
+  </nav>
+  <button class="sound" id="sound" type="button" aria-pressed="false">Sound off</button>
+</header>
+
+<div class="meter" id="meter" aria-live="polite">
+  <div class="ticks" id="ticks" aria-hidden="true"></div>
+  <p class="mono" id="meterText">Lights found 0 of 8</p>
+</div>
+<p class="hint mono" id="hint"></p>
+
+<aside class="panel" id="panel" aria-label="Details" aria-hidden="true">
+  <div class="handle" aria-hidden="true"></div>
+  <button class="close mono" id="close" type="button">Close</button>
+  <div class="panel-body" id="panelBody"></div>
+</aside>
+
+<div class="warp" id="warp" aria-hidden="true"></div>
+
+<div class="kb" id="kb" aria-label="Lights in the song"></div>
+
+<div class="fallback" id="fallback" hidden>
+  <img src="assets/cover.jpg" alt="Fireworks single cover art by Adam Sharp">
+  <p class="mono">3D view is not available on this device. Use the menu to read about the song.</p>
+</div>
+
+<div class="intro" id="intro">
+  <div class="intro-in">
+    <p class="mono dim">Adam Sharp presents</p>
+    <h1 class="title">Fireworks</h1>
+    <p class="tag">A new single about beholding the glory of God. Out Sunday, November 22, 2026.</p>
+    <p class="how" id="how">Spin the island and find the lights. Each one holds a scene from the song.</p>
+    <div class="actions">
+      <button class="btn btn-gold" id="enterSound" type="button">Enter with sound</button>
+      <button class="btn btn-ghost" id="enterQuiet" type="button">Enter quietly</button>
+    </div>
+    <p class="review mono">Draft for review. Not yet approved by Adam.</p>
+  </div>
+</div>
+
+<script src="vendor/three.r128.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
