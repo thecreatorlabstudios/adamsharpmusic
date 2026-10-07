@@ -203,7 +203,6 @@
   }
   $('enterSound').addEventListener('click', function () { enter(true); });
   $('enterQuiet').addEventListener('click', function () { enter(false); });
-  $('how').textContent = phone ? 'Drag to fly around the robed figure, above and below. Tap a planet to fly into its galaxy.' : 'Move to stir the light. Drag to fly around the robed figure, above and below. Scroll to go closer, and click a planet to fly into its galaxy.';
   var hintEl = $('hint');
   hintEl.textContent = phone ? 'Drag to look around. Pinch to zoom. Tap a planet.' : 'Drag to fly around. Scroll to go closer. Click a planet.';
   var ticksEl = $('ticks');
@@ -417,6 +416,7 @@
       };
     }
     var FW = makeFW(scene), FWg = makeFW(gScene);
+    function hexOf(c) { return [c.r, c.g, c.b]; }
     var PAL_GOLD = ['#ffd27d', '#fff4d6', '#ff9d4a', '#ffea9e'].map(hex);
     var PAL_COVER = ['#ff5fb0', '#ffe45c', '#9be84a', '#ffffff', '#ff9a3c', '#c26bff'].map(hex);
 
@@ -610,6 +610,23 @@
     for (var bq = 0; bq < BN; bq++) beamOff.push(0.15 + R() * 0.5);
     var beam = new THREE.Points(beamGeo, new THREE.PointsMaterial({ size: 0.22, map: glowTex, color: 0xffd27d, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
     beam.frustumCulled = false; beam.visible = false; scene.add(beam);
+    /* small fireworks that leave the figure's head and strike the galaxies one at a time, almost powering them */
+    var SPARK_COLS = ['#ff5fb0', '#ffe45c', '#9be84a', '#ff9a3c', '#c26bff', '#6fd6ff', '#ffffff'].map(function (h) { return new THREE.Color(h); });
+    var NS = phone ? 5 : 7, TL = 14, sparks = [], sparkPos = new Float32Array(NS * TL * 3), sparkCol = new Float32Array(NS * TL * 3), headPos = new THREE.Vector3(0.05, 1.45, 0.3);
+    var sparkGeo = new THREE.BufferGeometry();
+    sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3)); sparkGeo.setAttribute('color', new THREE.BufferAttribute(sparkCol, 3));
+    var sparkPts = new THREE.Points(sparkGeo, new THREE.PointsMaterial({ size: phone ? 0.34 : 0.28, map: glowTex, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    sparkPts.frustumCulled = false; scene.add(sparkPts);
+    for (var sk = 0; sk < NS; sk++) sparks.push({ on: false, u: 0, dur: 1.6, i: 0, col: SPARK_COLS[0], dx: 0, dz: 0, arc: 0.8 });
+    var nextSpark = 1.2;
+    function launchSpark(now) {
+      var free = null; for (var q = 0; q < sparks.length; q++) if (!sparks[q].on) { free = sparks[q]; break; }
+      if (!free) return;
+      var opts = []; for (var w = 0; w < lights.length; w++) if (!(SCENES[lights[w].i].holy && !unlocked)) opts.push(w);
+      var pick = opts[(R() * opts.length) | 0];
+      free.on = true; free.u = 0; free.dur = 1.3 + R() * 1.1; free.i = pick; free.col = SPARK_COLS[(R() * SPARK_COLS.length) | 0]; free.col2 = SPARK_COLS[(R() * SPARK_COLS.length) | 0];
+      free.dx = (R() - 0.5) * 1.6; free.dz = (R() - 0.5) * 1.2; free.arc = 0.5 + R() * 1.1;
+    }
 
     /* globe lattice: great circles and dots so the turning sphere reads in 3D */
     var lat = new Dust(), li;
@@ -918,8 +935,9 @@
         var pulse = 1 + 0.035 * Math.sin(t * 2 + L.ph);
         var sc2 = pulse * (1 + L.hover * 0.16) * (1 + audioE * 0.1);
         L.mesh.scale.setScalar(sc2);
-        L.halo.material.opacity = (sealed ? 0.2 : 0.14 + 0.3 * Math.min(gain, 1.5)) + audioE * 0.2; L.halo.scale.setScalar(L.r * (sealed ? 3.4 : 4.6) * sc2);
-        var gain = (sealed ? 0.42 : (holy ? 1.5 : (isF ? 1.25 : 0.5))) + L.hover * 0.4 + audioE * 0.25;
+        L.halo.material.opacity = (sealed ? 0.2 : 0.14 + 0.3 * Math.min(gain, 1.5)) + audioE * 0.2 + L.zap * 0.25; L.halo.scale.setScalar(L.r * (sealed ? 3.4 : 4.6) * sc2);
+        L.zap = (L.zap || 0) * Math.exp(-dt * 2.4);
+        var gain = (sealed ? 0.42 : (holy ? 1.5 : (isF ? 1.25 : 0.5))) + L.hover * 0.4 + audioE * 0.25 + L.zap * 0.55;
         if (trS >= 0 && tr.i === L.i) gain += ease(trS / 0.9) * 0.9;
         L.gainU.value = gain; applyGain(L.gl, gain, sealed ? [0.62, 0.72, 1] : null);
         if (L.link) L.link.visible = !!isF;
@@ -938,6 +956,23 @@
         Lj.lshow = Lj.vis && !tr; Lj.lbl.style.visibility = Lj.lshow ? 'visible' : 'hidden';
         Lj.lbl.classList.toggle('on', on && Lj.vis); Lj.lbl.classList.toggle('back', behind);
       }
+      /* sparks */
+      if (entered && mode === 'cosmos' && !tr && !hasPanel) { nextSpark -= dt; if (nextSpark <= 0) { launchSpark(); nextSpark = (reduce ? 3 : 0.5) + R() * 0.9; } }
+      for (var sq = 0; sq < sparks.length; sq++) {
+        var S = sparks[sq], base = sq * TL * 3;
+        if (!S.on) { for (var z = 0; z < TL; z++) { sparkCol[base + z * 3] = sparkCol[base + z * 3 + 1] = sparkCol[base + z * 3 + 2] = 0; } continue; }
+        S.u += dt / S.dur; var tgt = lights[S.i]; worldOf(tgt, v4);
+        for (var k = 0; k < TL; k++) {
+          var uu = Math.max(0, S.u - k * 0.028), e2 = uu * uu * (3 - 2 * uu), fade = (1 - k / TL) * (k === 0 ? 1.6 : 1.1) * Math.min(1, S.u * 6);
+          sparkPos[base + k * 3] = headPos.x + (v4.x - headPos.x) * e2 + Math.sin(uu * 6.2) * 0.12 * (1 - uu) + S.dx * Math.sin(uu * 3.1416) * 0.3;
+          sparkPos[base + k * 3 + 1] = headPos.y + (v4.y - headPos.y) * e2 + Math.sin(uu * 3.1416) * S.arc;
+          sparkPos[base + k * 3 + 2] = headPos.z + (v4.z - headPos.z) * e2 + S.dz * Math.sin(uu * 3.1416) * 0.3;
+          var cc = k < 3 ? S.col : S.col2;
+          sparkCol[base + k * 3] = cc.r * fade; sparkCol[base + k * 3 + 1] = cc.g * fade; sparkCol[base + k * 3 + 2] = cc.b * fade;
+        }
+        if (S.u >= 1) { S.on = false; tgt.zap = 1; FW.burst(v4.x, v4.y, v4.z, 0.5 + R() * 0.25, [hexOf(S.col), hexOf(S.col2), WHITE], false); }
+      }
+      sparkGeo.attributes.position.needsUpdate = true; sparkGeo.attributes.color.needsUpdate = true;
       if (trS >= 0 && lights[tr.i]) {
         worldOf(lights[tr.i], v4); var bp = beamGeo.attributes.position.array;
         for (var bk = 0; bk < BN; bk++) {
