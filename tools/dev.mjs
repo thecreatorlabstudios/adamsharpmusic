@@ -13,7 +13,7 @@ const { default: login } = await import('../api/login.js');
 const { default: logout } = await import('../api/logout.js');
 const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
 const rules = (vercel.headers || []).map((r) => ({ re: new RegExp('^' + r.source + '$'), headers: r.headers }));
-const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp3': 'audio/mpeg', '.txt': 'text/plain' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.txt': 'text/plain' };
 
 function applyHeaders(pathname, headers) { for (const r of rules) if (r.re.test(pathname)) for (const h of r.headers) headers[h.key] = h.value; return headers; }
 function end(res, pathname, status, headers, body) { res.writeHead(status, applyHeaders(pathname, headers)); res.end(body); }

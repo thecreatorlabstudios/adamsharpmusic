@@ -35,6 +35,8 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fail++;
   r = await s.get('/login'); const loginHtml = await r.text();
   ok(r.status === 200 && loginHtml.includes('Sign in') && loginHtml.includes('/api/login'), 'login page loads without signing in');
   ok((await s.get('/login.js')).status === 200, 'login script loads without signing in');
+  r = await s.get('/brand/logo-stacked.svg'); ok(r.status === 200 && r.headers.get('content-type') === 'image/svg+xml', 'logo loads on the sign-in page');
+  for (const p of ['/brand/../app.js', '/brand/%2e%2e/app.js', '/brand/..%2fassets/cover.jpg']) { r = await s.get(p); ok(r.status !== 200, `/brand cannot be used to reach other files (${p}, ${r.status})`); }
   ok(/default-src 'self'/.test(r.headers.get('content-security-policy')) && r.headers.get('x-frame-options') === 'DENY' && /noindex/.test(r.headers.get('x-robots-tag')), 'security headers are set');
   ok((await (await s.get('/robots.txt')).text()).includes('Disallow: /'), 'robots.txt disallows everything');
 

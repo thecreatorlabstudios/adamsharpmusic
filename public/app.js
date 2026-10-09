@@ -114,8 +114,8 @@
         '<p>His audience is broad on purpose. Some people are hearing his music for the first time and some have followed him for years.</p>' +
         '<div class="pics"><img src="' + ASSET.suit + '" alt="Adam Sharp in a navy suit leaning in a barn doorway"><img src="' + ASSET.smile + '" alt="Adam Sharp laughing, seated against a gray wall"></div>' +
         '<ul class="chips"><li>Worship music</li><li>Multilingual worship</li><li>Identity renewal</li><li>Leading worship</li><li>YWAM mission trips</li></ul>' +
-        '<h3 style="font:400 1.5rem/1.2 var(--f-display);margin:30px 0 8px">Behind <em>Fireworks</em></h3>' +
-        '<p class="quote" style="font-size:1.25rem">“Through this song, I want people to feel moved to seek God, so that they can experience Him in His fullness.”<small>Adam Sharp</small></p>' +
+        '<h3 class="sub">Behind <em>Fireworks</em></h3>' +
+        '<p class="quote" style="font-size:1.4rem">“Through this song, I want people to feel moved to seek God, so that they can experience Him in His fullness.”<small>Adam Sharp</small></p>' +
         '<div class="actions"><button class="btn btn-gold" type="button" data-go="release">Hear the new single</button></div>';
     },
     release: function () {
@@ -124,7 +124,7 @@
         '<details><summary class="mono">Read the lyrics</summary>' + lyricsHTML() + '</details>';
     },
     connect: function () {
-      return '<p class="eyebrow mono">Connect</p><h2>Stay close to <em>the music</em></h2><p>Follow Adam for release news, behind-the-scenes moments and new songs.</p><div class="actions"><a class="btn btn-gold" href="' + INSTA + '" target="_blank" rel="noopener">Instagram @theadamsharp</a><a class="btn btn-ghost" href="' + SPOTIFY + '" target="_blank" rel="noopener">Spotify</a></div><p class="dim" style="margin-top:22px;font-size:.88rem">Booking and contact details will be added once Adam confirms them.</p>' + (document.body.getAttribute('data-auth') === '1' ? '<form method="post" action="/api/logout" style="margin-top:26px"><button class="btn btn-ghost" type="submit">Sign out</button></form>' : '');
+      return '<p class="eyebrow mono">Connect</p><h2>Stay close to <em>the music</em></h2><p>Follow Adam for release news, behind-the-scenes moments and new songs.</p><div class="actions"><a class="btn btn-gold" href="' + INSTA + '" target="_blank" rel="noopener">Instagram @theadamsharp</a><a class="btn btn-ghost" href="' + SPOTIFY + '" target="_blank" rel="noopener">Spotify</a></div><p class="dim" style="margin-top:22px;font-size:.88rem">Booking and contact details will be added once Adam confirms them.</p><p class="sig">2 Corinthians 5:18\u201319</p>' + (document.body.getAttribute('data-auth') === '1' ? '<form method="post" action="/api/logout" style="margin-top:26px"><button class="btn btn-ghost" type="submit">Sign out</button></form>' : '');
     }
   };
   function openPanel(kind, idx) {
@@ -241,7 +241,7 @@
     try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false, powerPreference: 'high-performance' }); }
     catch (e) { fallbackMode(); return; }
     var DPR = Math.min(window.devicePixelRatio || 1, phone ? 1.5 : 2);
-    renderer.setPixelRatio(DPR); renderer.setClearColor(0x05060c, 1);
+    renderer.setPixelRatio(DPR); renderer.setClearColor(0x090816, 1);
     var scene = new THREE.Scene(), gScene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 120);
     var root = new THREE.Group(); scene.add(root);
@@ -250,7 +250,7 @@
     var gateGroup = new THREE.Group(); gateGroup.position.set(0, 0, -1.4); root.add(gateGroup);
     var figure = new THREE.Group(); root.add(figure);
     var GROUND = -1.85, FIG = 4.2, RR = 3.3, RP = phone ? 3.15 : 3.8;
-    var GOLD = [1, 0.82, 0.48], EMBER = [1, 0.54, 0.24], WHITE = [1, 0.96, 0.85], ROCK = [0.55, 0.5, 0.46], BLUE = [0.55, 0.65, 0.95], DIM = [0.36, 0.34, 0.42];
+    var GOLD = [0.949, 0.69, 0.341], EMBER = [1, 0.54, 0.24], WHITE = [1, 0.96, 0.85], ROCK = [0.55, 0.5, 0.46], BLUE = [0.55, 0.65, 0.95], DIM = [0.36, 0.34, 0.42];
     function mix(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
     function hex(h) { var n = parseInt(h.slice(1), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; }
     var R = Math.random;
@@ -417,7 +417,7 @@
     }
     var FW = makeFW(scene), FWg = makeFW(gScene);
     function hexOf(c) { return [c.r, c.g, c.b]; }
-    var PAL_GOLD = ['#ffd27d', '#fff4d6', '#ff9d4a', '#ffea9e'].map(hex);
+    var PAL_GOLD = ['#F2B057', '#FFC873', '#EEF0EE', '#B2C7F6'].map(hex);
     var PAL_COVER = ['#ff5fb0', '#ffe45c', '#9be84a', '#ffffff', '#ff9a3c', '#c26bff'].map(hex);
 
     /* ---------- Planets on a 3D globe around the figure ---------- */
@@ -433,7 +433,7 @@
       { a: '#fff4d6', b: '#ffd27d', bands: 6, ring: true }
     ];
     var glowTex = (function () { var c = document.createElement('canvas'); c.width = c.height = 128; var x = c.getContext('2d'); var g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(255,255,255,0.35)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
-    var ringTex = (function () { var c = document.createElement('canvas'); c.width = c.height = 128; var x = c.getContext('2d'); x.strokeStyle = 'rgba(255,225,150,0.95)'; x.lineWidth = 3; x.beginPath(); x.arc(64, 64, 52, 0, 6.2832); x.stroke(); var g = x.createRadialGradient(64, 64, 40, 64, 64, 64); g.addColorStop(0, 'rgba(255,225,150,0)'); g.addColorStop(0.8, 'rgba(255,225,150,0.25)'); g.addColorStop(1, 'rgba(255,225,150,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+    var ringTex = (function () { var c = document.createElement('canvas'); c.width = c.height = 128; var x = c.getContext('2d'); x.strokeStyle = 'rgba(242,176,87,0.95)'; x.lineWidth = 3; x.beginPath(); x.arc(64, 64, 52, 0, 6.2832); x.stroke(); var g = x.createRadialGradient(64, 64, 40, 64, 64, 64); g.addColorStop(0, 'rgba(242,176,87,0)'); g.addColorStop(0.8, 'rgba(242,176,87,0.25)'); g.addColorStop(1, 'rgba(242,176,87,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
     var labelsEl = $('labels');
     var lights = [];
     /* ---------- Real-looking galaxies, generated procedurally ---------- */
@@ -608,7 +608,7 @@
     var BN = 160, beamGeo = new THREE.BufferGeometry(), beamOff = [], beamSrc = new THREE.Vector3(0, 0.9, 0.25);
     beamGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(BN * 3), 3));
     for (var bq = 0; bq < BN; bq++) beamOff.push(0.15 + R() * 0.5);
-    var beam = new THREE.Points(beamGeo, new THREE.PointsMaterial({ size: 0.22, map: glowTex, color: 0xffd27d, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+    var beam = new THREE.Points(beamGeo, new THREE.PointsMaterial({ size: 0.22, map: glowTex, color: 0xF2B057, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
     beam.frustumCulled = false; beam.visible = false; scene.add(beam);
     /* small fireworks that leave the figure's head and strike the galaxies one at a time, almost powering them */
     var SPARK_COLS = ['#ff5fb0', '#ffe45c', '#9be84a', '#ff9a3c', '#c26bff', '#6fd6ff', '#ffffff'].map(function (h) { return new THREE.Color(h); });

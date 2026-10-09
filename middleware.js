@@ -3,7 +3,8 @@
 const COOKIE = 'as_session';
 const enc = new TextEncoder();
 
-const OPEN_PATHS = new Set(['/login', '/login.html', '/login.js', '/robots.txt', '/api/login', '/api/logout']);
+const OPEN_PATHS = new Set(['/login', '/login.html', '/login.js', '/robots.txt', '/api/login', '/api/logout',
+  '/brand/logo-stacked.svg', '/brand/logo-horizontal.svg', '/brand/symbol.svg', '/brand/monogram.svg']); // the logos and favicon load on the sign-in page
 
 function b64url(bytes) { let s = ''; for (const b of bytes) s += String.fromCharCode(b); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function b64urlToString(str) { const p = str.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((str.length + 3) % 4); return atob(p); }
