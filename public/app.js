@@ -130,7 +130,7 @@
     else { markFound(j); selected = j; openPanel('scene', j); }
   }
   Array.prototype.forEach.call(nav.children, function (b) {
-    b.addEventListener('click', function () { var k = b.getAttribute('data-open'); if (k === 'explore') closePanel(); else openPanel(k); });
+    b.addEventListener('click', function () { var k = b.getAttribute('data-open'); if (!k) return; if (k === 'explore') closePanel(); else openPanel(k); });
   });
   $('close').addEventListener('click', closePanel);
   document.addEventListener('keydown', function (e) {
