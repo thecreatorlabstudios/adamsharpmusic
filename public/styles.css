@@ -1,5 +1,5 @@
 /* Adam Sharp: Fireworks. One full-screen night world. Desktop: top menu, side panel. Phone: bottom dock, bottom sheet.
-   Brand: Adam Sharp Brand Guide, Draft 1. Midnight and Indigo grounds, Bone text, Spark Gold for one focal thing, UV Blue and Glow for light.
+   Brand: Adam Sharp Brand Guide, Midnight and Indigo grounds, Bone text, Spark Gold for one focal thing, UV Blue and Glow for light.
    Type: Cinzel capitals, Cormorant Garamond italic for lyrics, Jost for everything else. Ember is reserved for release art and is not used in the interface. */
 :root {
   --sky: #090816;       /* Midnight */
@@ -102,8 +102,6 @@ em { font-style: normal; color: var(--gold); }
 .prog { color: var(--dim); margin-top: 18px !important; }
 .lyr h4 { font: 500 0.72rem/1 var(--f-mono); letter-spacing: 0.26em; text-transform: uppercase; color: var(--gold); margin: 22px 0 8px; }
 .lyr p { font: italic 500 1.3rem/1.4 var(--f-serif); margin: 0; color: var(--ink); }
-.review-only { border: 1px dashed var(--line); border-radius: 4px; padding: 8px 12px; font-size: 0.82rem; color: var(--dim) !important; }
-body:not([data-review="true"]) .review-only, body:not([data-review="true"]) .review { display: none; }
 details summary { cursor: pointer; color: var(--gold); margin-top: 14px; }
 .sig { font: italic 500 1.2rem/1.4 var(--f-serif); color: var(--dim); margin-top: 26px !important; }
 
@@ -117,7 +115,6 @@ details summary { cursor: pointer; color: var(--gold); margin-top: 14px; }
 .intro-mark { height: clamp(64px, 14vh, 104px); width: auto; margin-bottom: 4px; }
 .tag { margin: 0; color: var(--ink); font-size: 1.08rem; max-width: 34ch; text-wrap: balance; text-shadow: 0 1px 12px #000; }
 .intro .actions { justify-content: center; margin-top: 6px; }
-.review { color: var(--dim); opacity: 0.9; margin-top: 8px !important; }
 
 .fallback { position: fixed; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; }
 .fallback img { width: min(70vmin, 420px); border-radius: 4px; }
@@ -182,5 +179,7 @@ details summary { cursor: pointer; color: var(--gold); margin-top: 14px; }
 .guide li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start; color: var(--ink); font-size: 0.98rem; line-height: 1.5; }
 .guide li b { color: #fff; }
 .guide .n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: var(--sky); font: 600 0.85rem/1 var(--f-body); }
-.intro .review { color: var(--dim); opacity: 0.9; }
-@media (max-height: 700px) { .title { font-size: clamp(2rem, 8vw, 3.6rem); } .intro-mark { height: 52px; } .guide li { font-size: 0.9rem; } }
+.intro @media (max-height: 700px) { .title { font-size: clamp(2rem, 8vw, 3.6rem); } .intro-mark { height: 52px; } .guide li { font-size: 0.9rem; } }
+.nav .navlink { font: 500 0.72rem/1 var(--f-mono); letter-spacing: 0.2em; text-transform: uppercase; padding: 11px 15px; border-radius: 999px; border: 1px solid var(--line); background: rgba(9, 8, 22, 0.55); color: var(--dim); text-decoration: none; display: inline-flex; align-items: center; }
+.nav .navlink:hover { color: var(--ink); }
+.mode-phone .nav .navlink { flex: 1; justify-content: center; padding: 14px 4px; border: 0; background: transparent; font-size: 0.68rem; letter-spacing: 0.16em; }

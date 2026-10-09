@@ -20,7 +20,6 @@ New Project > import the repo. Framework: Other. Leave build and output blank (`
 | `SITE_USERS` | the joined `name:salt:hash` lines |
 | `SESSION_SECRET` | random text, 32+ characters (without it nobody can sign in, by design) |
 | `REQUIRE_LOGIN` | `true` |
-| `APPROVED` | `false` |
 | `SESSION_HOURS` | `12` (optional) |
 
 Deploy. Visiting the URL shows the login page. Also turn on **Deployment Protection > Standard Protection** for preview URLs so branch previews are not public.
@@ -33,11 +32,9 @@ In Vercel: Project > Settings > Domains > add `yourdomain.com` (and `www`). Verc
 HTTPS is issued automatically once DNS resolves (minutes to a few hours).
 If you keep the domain at Hostinger but also have a Hostinger hosting plan, you do not need it for this site. Vercel does the hosting.
 
-## Approval day
-1. Adam signs off on the photos, cover, promo, lyrics, quotes and Scripture references.
-2. Set `APPROVED` = `true` (redeploy). The "draft for review" notes disappear.
-3. To open the site to everyone: set `REQUIRE_LOGIN` = `false` and redeploy. Also delete the `X-Robots-Tag` header in `vercel.json` and the `Disallow: /` line in `public/robots.txt` so search engines can find it.
-4. Swap in the final master audio, add the pre-save link and contact details.
+## Going live
+1. Set `REQUIRE_LOGIN` = `false` in Vercel and redeploy. The site is public and the login is bypassed.
+2. Check `/` and `/fireworks` in a private window.
 
 ## Test locally
 `npm run dev` starts a local copy of how Vercel runs this (set `SITE_USERS` and `SESSION_SECRET` first, or use the example in `.env.example`). `npm test` runs 50+ checks against the login. Neither needs a Vercel account.
@@ -45,7 +42,7 @@ If you keep the domain at Hostinger but also have a Hostinger hosting plan, you 
 ## What the login does
 - Server-side check on every request, including images and audio. Unsigned requests get the login page (pages) or 401 (files).
 - Passwords are stored only as scrypt hashes and compared in constant time. Unknown users take the same time as wrong passwords.
-- Session cookie is signed (HMAC), HttpOnly, SameSite=Lax, Secure. Lasts 12 hours. Sign out is in the Connect panel.
+- Session cookie is signed (HMAC), HttpOnly, SameSite=Lax, Secure. Lasts 12 hours. Sign out is in the footer of the landing page.
 - Cross-site form posts are refused. Open redirects are blocked.
 - Fails closed: with no `SESSION_SECRET` or no users, nobody gets in.
 - Not indexed (noindex header, robots.txt).

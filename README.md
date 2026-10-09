@@ -1,5 +1,6 @@
-# Adam Sharp: Fireworks, 3D site (draft, 2026-10-06)
-Status: DRAFT for Joshua's review. Not yet approved by Adam. Not hosted anywhere yet.
+# Adam Sharp: artist site and Fireworks experience
+Status: ready to go live. Pages: `/` (landing with the featured release, Spotify embed and socials, tabs for Home, Releases, About, Connect) and `/fireworks` (the 3D song experience).
+Adding new music: add an entry to `RELEASES` at the top of `public/site.js` (the Releases tab and featured release update from it). Pre-save link: https://distrokid.com/hyperfollow/adamsharp3/fireworks
 Preview (private artifact): https://claude.ai/artifact/Cnj932bVVsAkq5qx37v999
 The site lives in `public/` (`index.html`, `styles.css`, `app.js`, `assets/`, `vendor/three.r128.min.js` self-hosted, `login.html`). `middleware.js` and `api/` are the login for Vercel. See `DEPLOY.md` (Vercel + Hostinger domain). `npm run dev` runs a local copy of Vercel's request flow, `npm test` runs the login checks.
 
@@ -22,7 +23,6 @@ The site lives in `public/` (`index.html`, `styles.css`, `app.js`, `assets/`, `v
 - Scripture references are our suggestions from the lyrics, especially "the fire" (Daniel 3). They show with a review note.
 - Wording that is our paraphrase of his answers.
 - Left out on purpose: his dad and favorite artists, coffee, anime.
-- Draft markers (intro line, Scripture note) disappear when `data-review="true"` is removed from `<body>`.
 
 ## Still open
 Pre-save link (button disabled), other streaming links, contact/booking details, domain and hosting, final full-song audio, scope and budget.

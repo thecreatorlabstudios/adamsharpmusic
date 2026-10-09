@@ -3,7 +3,7 @@
 const COOKIE = 'as_session';
 const enc = new TextEncoder();
 
-const OPEN_PATHS = new Set(['/login', '/login.html', '/login.js', '/robots.txt', '/api/login', '/api/logout',
+const OPEN_PATHS = new Set(['/login', '/login.html', '/login.js', '/robots.txt', '/sitemap.xml', '/api/login', '/api/logout',
   '/brand/logo-stacked.svg', '/brand/logo-horizontal.svg', '/brand/symbol.svg', '/brand/monogram.svg']); // the logos and favicon load on the sign-in page
 
 function b64url(bytes) { let s = ''; for (const b of bytes) s += String.fromCharCode(b); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
@@ -42,6 +42,6 @@ export default async function middleware(request) {
     }
     return json(401, { error: 'Sign in required' });
   }
-  if (p === '/api/config') return json(200, { auth: true, approved: process.env.APPROVED === 'true' });
+  if (p === '/api/config') return json(200, { auth: true });
   return pass();
 }

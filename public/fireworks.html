@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="theme-color" content="#090816">
+<link rel="icon" type="image/svg+xml" href="/brand/monogram.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fireworks | Adam Sharp</title>
+<meta name="description" content="Step inside Fireworks, the new single from Adam Sharp. Out Sunday, November 22, 2026.">
+<link rel="canonical" href="https://adamsharpmusic.com/fireworks">
+<meta property="og:type" content="music.song">
+<meta property="og:site_name" content="Adam Sharp">
+<meta property="og:title" content="Fireworks | Adam Sharp">
+<meta property="og:description" content="Out Sunday, November 22, 2026. Step inside the song and explore the galaxies inside it.">
+<meta property="og:url" content="https://adamsharpmusic.com/fireworks">
+<meta property="og:image" content="https://adamsharpmusic.com/assets/cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Jost:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<canvas id="gl" aria-hidden="true"></canvas>
+<div id="labels" aria-hidden="true"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<header class="hud" id="hud">
+  <a class="brand" href="/" id="brand" aria-label="Adam Sharp, home"><img src="/brand/logo-horizontal.svg" alt="Adam Sharp, singer and songwriter" width="214" height="36"></a>
+  <nav class="nav" id="nav" aria-label="Main">
+    <button type="button" data-open="explore" aria-current="page">Explore</button>
+    <button type="button" data-open="release">The song</button>
+    <a class="navlink" href="/">All music</a>
+  </nav>
+  <button class="sound" id="sound" type="button" aria-pressed="false">Sound off</button>
+</header>
+
+<div class="meter" id="meter" aria-live="polite">
+  <div class="ticks" id="ticks" aria-hidden="true"></div>
+  <p class="mono" id="meterText">Lights found 0 of 8</p>
+</div>
+<p class="hint mono" id="hint"></p>
+
+<aside class="panel" id="panel" aria-label="Details" aria-hidden="true">
+  <div class="handle" aria-hidden="true"></div>
+  <button class="close mono" id="close" type="button">Close</button>
+  <div class="panel-body" id="panelBody"></div>
+</aside>
+
+<div class="warp" id="warp" aria-hidden="true"></div>
+
+<div class="kb" id="kb" aria-label="Lights in the song"></div>
+
+<div class="fallback" id="fallback" hidden>
+  <img src="/assets/cover.jpg" alt="Fireworks single cover art by Adam Sharp">
+  <p class="mono">3D view is not available on this device. Use the menu to read about the song.</p>
+</div>
+
+<div class="intro" id="intro">
+  <div class="intro-in">
+    <img class="intro-mark" src="/brand/symbol.svg" alt="Adam Sharp symbol: halo and rising light">
+    <p class="mono kicker">Adam Sharp presents</p>
+    <h1 class="title">Fireworks</h1>
+    <p class="tag">A new single about beholding the glory of God. Out Sunday, November 22, 2026.</p>
+    <div class="guide">
+      <p class="guide-h mono">How to explore the song</p>
+      <ol>
+        <li><span class="n">1</span><span><b>Drag</b> to fly around the robed figure, above and below.</span></li>
+        <li><span class="n">2</span><span><b>Tap a galaxy</b> to fly inside. Each one is a moment from the song, with its lyric, its story and where it sits in the song.</span></li>
+        <li><span class="n">3</span><span><b>Visit all 8</b> and the last one, <b>The Holy Place</b>, opens. It is where the song ends.</span></li>
+      </ol>
+    </div>
+    <div class="actions">
+      <button class="btn btn-bone" id="enterSound" type="button">Enter with sound</button>
+      <button class="btn btn-ghost" id="enterQuiet" type="button">Enter quietly</button>
+    </div>
+  </div>
+</div>
+
+<script src="/vendor/three.r128.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

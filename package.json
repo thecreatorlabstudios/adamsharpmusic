@@ -2,7 +2,7 @@
   "name": "adam-sharp-fireworks",
   "version": "1.0.0",
   "private": true,
-  "description": "Private preview site for Adam Sharp's single Fireworks. Deploys to Vercel. Login required until approval.",
+  "description": "Adam Sharp's artist site and the Fireworks single experience. Deploys to Vercel. Set REQUIRE_LOGIN=false to make it public.",
   "type": "module",
   "scripts": {
     "dev": "node tools/dev.mjs",

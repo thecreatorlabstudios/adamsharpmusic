@@ -1,9 +1,9 @@
 (function () {
   'use strict';
-  var ASSET = { cover: 'assets/cover.jpg', suit: 'assets/suit.jpg', smile: 'assets/smile.jpg', audio: 'assets/fireworks-promo.mp3' };
+  var ASSET = { cover: '/assets/cover.jpg', suit: '/assets/suit.jpg', smile: '/assets/smile.jpg', audio: '/assets/fireworks-promo.mp3' };
   var $ = function (id) { return document.getElementById(id); };
-  /* private preview: the server says whether a login is active and whether Adam has approved */
-  try { fetch('/api/config', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (c) { if (!c) return; if (c.auth) document.body.setAttribute('data-auth', '1'); if (c.approved) document.body.setAttribute('data-review', 'false'); }).catch(function () {}); } catch (e) {}
+  /* the server says whether a login is active (kept for the preview login) */
+  try { fetch('/api/config', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (c) { if (!c) return; if (c.auth) document.body.setAttribute('data-auth', '1'); }).catch(function () {}); } catch (e) {}
   var html = document.documentElement;
   var reduce = false;
   try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
@@ -69,6 +69,7 @@
     return '<div class="lyr">' + FULL.map(function (s) { return '<h4>' + s[0] + '</h4><p>' + s[1].join('<br>') + '</p>'; }).join('') + '</div>';
   }
   var SPOTIFY = 'https://open.spotify.com/artist/2xJgiwNjOqtVyBPJH6k14C';
+  var PRESAVE = 'https://distrokid.com/hyperfollow/adamsharp3/fireworks';
   var INSTA = 'https://www.instagram.com/theadamsharp/';
   function countHTML() {
     return '<div class="count" role="timer" aria-label="Time until release"><div><b data-cd="d">--</b><span class="mono">Days</span></div><div><b data-cd="h">--</b><span class="mono">Hours</span></div><div><b data-cd="m">--</b><span class="mono">Min</span></div><div><b data-cd="s">--</b><span class="mono">Sec</span></div></div>';
@@ -102,29 +103,13 @@
     } else {
       h += '<p class="prog mono">' + foundCount + ' of ' + GOAL + ' galaxies visited</p>';
     }
-    h += '<p class="review-only">Review: Scripture references are CreatorLab’s suggestions based on the lyrics. Adam confirms them before launch.</p>';
     return h;
   }
   var PANELS = {
-    story: function () {
-      return '<p class="eyebrow mono">Story</p><h2>I’ve always been a musician. <em>I love music.</em></h2>' +
-        '<p>Adam Sharp has been making music for as long as he can remember. He started leading worship in high school, and that calling took him on mission trips with YWAM.</p>' +
-        '<p>Two things sit at the center of his work. One is multilingual worship, singing to God in more than one language. The other is identity renewal within Christians.</p>' +
-        '<p class="quote">“My heart is that all will come to know Christ as I have known Him, so that they can experience the same love that I have.”<small>Adam Sharp</small></p>' +
-        '<p>His audience is broad on purpose. Some people are hearing his music for the first time and some have followed him for years.</p>' +
-        '<div class="pics"><img src="' + ASSET.suit + '" alt="Adam Sharp in a navy suit leaning in a barn doorway"><img src="' + ASSET.smile + '" alt="Adam Sharp laughing, seated against a gray wall"></div>' +
-        '<ul class="chips"><li>Worship music</li><li>Multilingual worship</li><li>Identity renewal</li><li>Leading worship</li><li>YWAM mission trips</li></ul>' +
-        '<h3 class="sub">Behind <em>Fireworks</em></h3>' +
-        '<p class="quote" style="font-size:1.4rem">“Through this song, I want people to feel moved to seek God, so that they can experience Him in His fullness.”<small>Adam Sharp</small></p>' +
-        '<div class="actions"><button class="btn btn-gold" type="button" data-go="release">Hear the new single</button></div>';
-    },
     release: function () {
       return '<img class="cover" src="' + ASSET.cover + '" alt="Fireworks single cover art by Adam Sharp"><p class="eyebrow mono">New single · Christian worship</p><h2>Fireworks</h2><p class="dim">Adam Sharp · Out Sunday, November 22, 2026</p>' + countHTML() +
-        '<div class="actions"><a class="btn btn-gold" href="' + SPOTIFY + '" target="_blank" rel="noopener">Listen on Spotify</a><button class="btn btn-ghost" type="button" data-sound-toggle>' + (soundOn ? 'Pause the promo' : 'Play the promo') + '</button><button class="btn btn-ghost" type="button" disabled>Pre-save link coming</button></div>' +
+        '<div class="actions"><a class="btn btn-gold" href="' + PRESAVE + '" target="_blank" rel="noopener">Pre-save on your music app</a><button class="btn btn-ghost" type="button" data-sound-toggle>' + (soundOn ? 'Pause the promo' : 'Play the promo') + '</button></div>' +
         '<details><summary class="mono">Read the lyrics</summary>' + lyricsHTML() + '</details>';
-    },
-    connect: function () {
-      return '<p class="eyebrow mono">Connect</p><h2>Stay close to <em>the music</em></h2><p>Follow Adam for release news, behind-the-scenes moments and new songs.</p><div class="actions"><a class="btn btn-gold" href="' + INSTA + '" target="_blank" rel="noopener">Instagram @theadamsharp</a><a class="btn btn-ghost" href="' + SPOTIFY + '" target="_blank" rel="noopener">Spotify</a></div><p class="dim" style="margin-top:22px;font-size:.88rem">Booking and contact details will be added once Adam confirms them.</p><p class="sig">2 Corinthians 5:18\u201319</p>' + (document.body.getAttribute('data-auth') === '1' ? '<form method="post" action="/api/logout" style="margin-top:26px"><button class="btn btn-ghost" type="submit">Sign out</button></form>' : '');
     }
   };
   function openPanel(kind, idx) {
@@ -148,7 +133,6 @@
     b.addEventListener('click', function () { var k = b.getAttribute('data-open'); if (k === 'explore') closePanel(); else openPanel(k); });
   });
   $('close').addEventListener('click', closePanel);
-  $('brand').addEventListener('click', function (e) { e.preventDefault(); closePanel(); });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closePanel();
     if (world && world.inGalaxy() && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) world.step(e.key === 'ArrowRight' ? 1 : -1);

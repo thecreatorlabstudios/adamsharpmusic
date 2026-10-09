@@ -31,14 +31,14 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fail++;
   const s = await boot({});
   let r = await s.get('/', { Accept: 'text/html' });
   ok(r.status === 303 && r.headers.get('location').startsWith('/login'), 'anonymous page request is sent to /login');
-  for (const p of ['/assets/cover.jpg', '/assets/fireworks-promo.mp3', '/app.js', '/styles.css', '/vendor/three.r128.min.js', '/index.html', '/api/config']) { r = await s.get(p); ok(r.status === 401, `anonymous ${p} is blocked (${r.status})`); }
+  for (const p of ['/assets/cover.jpg', '/assets/fireworks-promo.mp3', '/app.js', '/styles.css', '/vendor/three.r128.min.js', '/index.html', '/fireworks', '/api/config']) { r = await s.get(p); ok(r.status === 401, `anonymous ${p} is blocked (${r.status})`); }
   r = await s.get('/login'); const loginHtml = await r.text();
   ok(r.status === 200 && loginHtml.includes('Sign in') && loginHtml.includes('/api/login'), 'login page loads without signing in');
   ok((await s.get('/login.js')).status === 200, 'login script loads without signing in');
   r = await s.get('/brand/logo-stacked.svg'); ok(r.status === 200 && r.headers.get('content-type') === 'image/svg+xml', 'logo loads on the sign-in page');
   for (const p of ['/brand/../app.js', '/brand/%2e%2e/app.js', '/brand/..%2fassets/cover.jpg']) { r = await s.get(p); ok(r.status !== 200, `/brand cannot be used to reach other files (${p}, ${r.status})`); }
-  ok(/default-src 'self'/.test(r.headers.get('content-security-policy')) && r.headers.get('x-frame-options') === 'DENY' && /noindex/.test(r.headers.get('x-robots-tag')), 'security headers are set');
-  ok((await (await s.get('/robots.txt')).text()).includes('Disallow: /'), 'robots.txt disallows everything');
+  ok(/default-src 'self'/.test(r.headers.get('content-security-policy')) && r.headers.get('x-frame-options') === 'DENY', 'security headers are set');
+  ok((await (await s.get('/robots.txt')).text()).includes('Allow: /'), 'robots.txt is open');
 
   for (const p of ['/..%2f..%2fmiddleware.js', '/%2e%2e/middleware.js', '/.env', '/%00', '/..%5cmiddleware.js']) { r = await s.get(p); ok(r.status !== 200, `traversal ${p} does not leak while signed out (${r.status})`); }
 
@@ -53,9 +53,10 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fail++;
   ok(/HttpOnly/.test(setCookie) && /SameSite=Lax/.test(setCookie), 'cookie is HttpOnly and SameSite');
   const session = setCookie.split(';')[0];
 
-  r = await s.get('/', { Cookie: session, Accept: 'text/html' }); ok(r.status === 200 && (await r.text()).includes('<canvas id="gl"'), 'signed-in user gets the site');
+  r = await s.get('/', { Cookie: session, Accept: 'text/html' }); ok(r.status === 200 && (await r.text()).includes('id="releaseList"'), 'signed-in user gets the landing page');
+  r = await s.get('/fireworks', { Cookie: session, Accept: 'text/html' }); ok(r.status === 200 && (await r.text()).includes('<canvas id="gl"'), 'signed-in user gets the Fireworks experience');
   r = await s.get('/assets/cover.jpg', { Cookie: session }); ok(r.status === 200 && r.headers.get('content-type') === 'image/jpeg', 'signed-in user gets assets');
-  r = await s.get('/api/config', { Cookie: session }); const cfg = await r.json(); ok(r.status === 200 && cfg.auth === true && cfg.approved === false, 'signed-in config says login is on and not yet approved');
+  r = await s.get('/api/config', { Cookie: session }); const cfg = await r.json(); ok(r.status === 200 && cfg.auth === true , 'signed-in config says a login is active');
   r = await s.get('/assets/fireworks-promo.mp3', { Cookie: session, Range: 'bytes=0-99' }); ok(r.status === 206 && r.headers.get('content-range').startsWith('bytes 0-99/') && (await r.arrayBuffer()).byteLength === 100, 'audio byte ranges work');
   r = await s.get('/assets/fireworks-promo.mp3', { Cookie: session, Range: 'bytes=99999999-' }); ok(r.status === 416, 'bad range gets 416');
   for (const p of ['/middleware.js', '/api/login.js', '/vercel.json', '/package.json', '/tools/hash.mjs', '/..%2fmiddleware.js', '/%2e%2e/package.json', '/assets/%2e%2e/%2e%2e/middleware.js', '/.env', '/%00']) {
@@ -89,20 +90,11 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fail++;
   const r = await s.post('/api/login', { username: 'tester', password: PASS }); ok(r.status === 500, 'no users configured: login refuses');
   s.proc.kill();
 }
-/* ---------- opened up after approval ---------- */
+/* ---------- public ---------- */
 {
   const s = await boot({ REQUIRE_LOGIN: 'false' });
   const r = await s.get('/assets/cover.jpg'); ok(r.status === 200, 'REQUIRE_LOGIN=false opens the site');
   s.proc.kill();
 }
-/* ---------- approval flag ---------- */
-{
-  const s = await boot({ APPROVED: 'true' });
-  const login = await s.post('/api/login', { username: 'tester', password: PASS }, { 'Sec-Fetch-Site': 'same-origin' });
-  const cfg = await (await s.get('/api/config', { Cookie: login.headers.get('set-cookie').split(';')[0] })).json();
-  ok(cfg.approved === true, 'APPROVED=true is reported to the site');
-  s.proc.kill();
-}
-
 console.log(fail ? `\n${fail} check(s) FAILED` : '\nAll checks passed');
 process.exit(fail ? 1 : 0);

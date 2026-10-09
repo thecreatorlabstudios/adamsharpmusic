@@ -1,5 +1,5 @@
 # Brand applied to this site
-Source: Adam Sharp Brand Guide, Draft 1 (Claude artifact, October 2026): https://claude.ai/artifact/4Y4pAy7g3p1H9qaU3tHnDg
+Source: Adam Sharp Brand Guide (Claude artifact, October 2026): https://claude.ai/artifact/4Y4pAy7g3p1H9qaU3tHnDg
 
 | Guide | Where it is used |
 |---|---|
