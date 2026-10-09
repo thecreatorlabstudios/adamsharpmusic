@@ -71,3 +71,8 @@ footer form { margin:0; } footer button { background:none; border:0; color:var(-
 .galaxies button:hover { color:var(--ink); } .galaxies button[aria-selected="true"] { color:var(--gold); border-color:rgba(242,176,87,.7); }
 .gdetail { padding:22px; min-height:120px; } .gdetail h3 { margin:0 0 6px; } .gdetail p { margin:.4em 0; }
 @media (prefers-reduced-motion:reduce) { .kcard,.kcard p { transition:none; } }
+
+.outnow { display:grid; grid-template-columns:300px 1fr; gap:32px; padding:28px; align-items:center; box-shadow:0 20px 60px rgba(84,104,255,.18); }
+.outnow img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; }
+.outnow h3 { font-size:clamp(1.6rem,3.4vw,2.4rem); margin:12px 0 6px; } .outnow p { margin:.5em 0; font-size:1.05rem; }
+@media (max-width:760px) { .outnow { grid-template-columns:1fr; gap:18px; padding:18px; } .outnow img { max-width:340px; } }
