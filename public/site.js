@@ -20,13 +20,40 @@
   /* tabs */
   var views = document.querySelectorAll('[data-view]'), links = document.querySelectorAll('nav.tabs a');
   function show() {
-    var t = (location.hash || '#home').slice(1); if (!document.getElementById('view-' + t)) t = 'home';
+    var t = (location.hash || '#home').slice(1); if (t === 'about') t = 'story'; if (!document.getElementById('view-' + t)) t = 'home';
     Array.prototype.forEach.call(views, function (v) { v.hidden = v.getAttribute('data-view') !== t; });
     Array.prototype.forEach.call(links, function (a) { if (a.getAttribute('data-tab') === t) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     document.title = (t === 'home' ? 'Adam Sharp | Worship Artist' : t.charAt(0).toUpperCase() + t.slice(1) + ' | Adam Sharp');
     window.scrollTo(0, 0);
   }
   window.addEventListener('hashchange', show); show();
+
+
+  /* Get to know Adam: tap to open a card */
+  Array.prototype.forEach.call(document.querySelectorAll('#know .kcard'), function (b) {
+    b.addEventListener('click', function () { var open = b.getAttribute('aria-expanded') === 'true'; b.setAttribute('aria-expanded', open ? 'false' : 'true'); });
+  });
+
+  /* Inside the song: the galaxies and the moment each one stands for. Order follows the song. */
+  var GAL = [
+    ['The Rooster', 'Sunflower Galaxy', 'A golden spiral with many short, feathery arms, named for its likeness to a sunflower. Paired with the first light of day when the rooster crows.'],
+    ['Bread and Wine', 'Sombrero Galaxy', 'A glowing round bulge cut across by a dark lane of dust, like a loaf broken in two.'],
+    ['Lifted Up', 'Andromeda Galaxy', 'Named for the princess in Greek myth who was chained and then rescued. It is the nearest large galaxy to ours.'],
+    ['Moses', 'NGC 1300', 'A barred spiral with a straight bar of stars through its center, like the staff of Moses.'],
+    ['Lazarus', 'Black Eye Galaxy', 'Also called the Sleeping Beauty galaxy, for the dark band of dust across its bright core. Paired with Lazarus, called out of sleep.'],
+    ['The Sea', 'Whirlpool Galaxy', 'A grand spiral swirling like water, with a smaller galaxy beside it.'],
+    ['The Fire', 'Cigar Galaxy', 'A starburst galaxy making stars at a furious pace, with red glowing gas streaming out from its center.'],
+    ['The Storm', 'Cartwheel Galaxy', 'A ring galaxy shaped by a collision about 400 million years ago, with ripples spreading outward like a storm.'],
+    ['The Holy Place', 'Fireworks Galaxy', 'Nicknamed for its supernovae: ten have been seen in about 50 years. It is about 22 million light-years away, and it shares its name with the song.']
+  ];
+  var PART = ['Verse 1', 'Verse 2', 'Chorus', 'The build', 'The build', 'The build', 'The build', 'The build', 'Closing'];
+  var gBox = document.getElementById('galaxies'), gOut = document.getElementById('gdetail');
+  function pickG(i) {
+    Array.prototype.forEach.call(gBox.children, function (b, k) { b.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+    gOut.innerHTML = '<p class="mono" style="color:var(--gold)">' + esc(PART[i]) + ' · ' + esc(GAL[i][0]) + '</p><h3>' + esc(GAL[i][1]) + '</h3><p>' + esc(GAL[i][2]) + '</p>';
+  }
+  GAL.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.textContent = g[0]; b.addEventListener('click', function () { pickG(i); }); gBox.appendChild(b); });
+  pickG(0);
 
   /* countdown to the lead release */
   var target = new Date(RELEASES[0].date).getTime(), box = document.getElementById('count');

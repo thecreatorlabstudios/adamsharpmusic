@@ -55,3 +55,19 @@ footer form { margin:0; } footer button { background:none; border:0; color:var(-
   .rel { grid-template-columns:110px 1fr; gap:16px; padding:14px; } .rel h3 { font-size:1.25rem; } .count div { min-width:0; flex:1; }
   header.top .wrap { flex-direction:column; gap:4px; padding:8px 0 4px; } nav.tabs { justify-content:center; } header.top img { height:28px; } nav.tabs a { padding:9px 10px; letter-spacing:.12em; font-size:.66rem; } section.view { padding:32px 0 56px; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+
+.lede2 { margin:-4px 0 22px; }
+.know { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; }
+.kcard { text-align:left; font:inherit; color:inherit; cursor:pointer; padding:22px; border-radius:8px; background:rgba(20,21,44,.78); border:1px solid var(--line); transition:border-color .2s, transform .2s; display:block; }
+.kcard:hover { border-color:var(--dim); transform:translateY(-2px); }
+.kcard .mono { color:var(--gold); display:block; }
+.kcard b { display:block; font:600 1.05rem/1.3 var(--f-display); letter-spacing:.06em; text-transform:uppercase; margin:8px 0; }
+.kcard i { display:block; font:italic 500 1.2rem/1.35 var(--f-serif); color:var(--dim); }
+.kcard p { margin:12px 0 0; max-height:0; overflow:hidden; opacity:0; transition:max-height .35s, opacity .3s; font-size:.95rem; line-height:1.55; }
+.kcard[aria-expanded="true"] { border-color:rgba(242,176,87,.6); }
+.kcard[aria-expanded="true"] p { max-height:320px; opacity:1; }
+.galaxies { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.galaxies button { font:500 .74rem/1 var(--f-body); letter-spacing:.16em; text-transform:uppercase; padding:12px 16px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--dim); cursor:pointer; min-height:44px; }
+.galaxies button:hover { color:var(--ink); } .galaxies button[aria-selected="true"] { color:var(--gold); border-color:rgba(242,176,87,.7); }
+.gdetail { padding:22px; min-height:120px; } .gdetail h3 { margin:0 0 6px; } .gdetail p { margin:.4em 0; }
+@media (prefers-reduced-motion:reduce) { .kcard,.kcard p { transition:none; } }
