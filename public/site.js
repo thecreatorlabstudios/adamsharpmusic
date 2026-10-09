@@ -3,6 +3,7 @@
   /* To add new music: add an entry to the top of RELEASES. Set link to its page (or Spotify) and date to its release date. */
   var RELEASES = [
     { title: 'Fireworks', type: 'Single', date: '2026-11-22T00:00:00-08:00', blurb: 'A song about beholding the glory of God. Explore the song, find the lights and read the story behind it.', cover: '/assets/cover.jpg', page: '/fireworks', pageLabel: 'Step inside the song', link: 'https://distrokid.com/hyperfollow/adamsharp3/fireworks', linkLabel: 'Pre-save' }
+    ,{ title: 'Hold Onto Me', type: 'Single', date: '2025-08-01T00:00:00-07:00', blurb: 'Adam’s 2025 single, out now on Spotify and everywhere you listen.', cover: '/assets/hold-onto-me.jpg', link: 'https://open.spotify.com/artist/2xJgiwNjOqtVyBPJH6k14C', linkLabel: 'Listen on Spotify' }
   ];
   var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   function pretty(iso) { var d = new Date(iso); return DAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); }
@@ -14,8 +15,14 @@
     return '<article class="card rel"><img src="' + r.cover + '" alt="' + esc(r.title) + ' cover art" loading="lazy"><div>' +
       '<span class="tag mono">' + (out ? 'Out now' : 'Coming ' + pretty(r.date).split(', ').slice(1).join(', ')) + '</span>' +
       '<h3>' + esc(r.title) + '</h3><p class="dim">' + esc(r.type) + ' · ' + pretty(r.date) + '</p><p>' + esc(r.blurb) + '</p>' +
-      '<div class="actions" style="margin-top:14px"><a class="btn btn-gold" href="' + r.page + '">' + esc(r.pageLabel) + '</a><a class="btn btn-ghost" href="' + r.link + '" target="_blank" rel="noopener">' + (r.linkLabel || 'Listen') + '</a></div></div></article>';
+      '<div class="actions" style="margin-top:14px">' + (r.page ? '<a class="btn btn-gold" href="' + r.page + '">' + esc(r.pageLabel) + '</a>' : '') + '<a class="btn ' + (r.page ? 'btn-ghost' : 'btn-gold') + '" href="' + r.link + '" target="_blank" rel="noopener">' + (r.linkLabel || 'Listen') + '</a></div></div></article>';
   }).join('') + '<div class="card soon mono">More music coming</div>';
+
+  var also = document.getElementById('alsoOut');
+  also.innerHTML = RELEASES.filter(function (r) { return new Date(r.date) <= new Date(); }).map(function (r) {
+    return '<a class="card social" href="' + r.link + '" target="_blank" rel="noopener"><img src="' + r.cover + '" alt="' + esc(r.title) + ' cover art" width="72" height="72" style="border-radius:4px;flex:none"><div><b>' + esc(r.title) + '</b><span>' + esc(r.type) + ' · ' + pretty(r.date).split(', ').slice(1).join(', ') + ' · Listen on Spotify</span></div></a>';
+  }).join('');
+  also.parentNode.hidden = !also.innerHTML;
 
   /* tabs */
   var views = document.querySelectorAll('[data-view]'), links = document.querySelectorAll('nav.tabs a');
