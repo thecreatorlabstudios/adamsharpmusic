@@ -62,7 +62,7 @@
   function pickG(i) {
     Array.prototype.forEach.call(gBox.children, function (b, k) { b.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
     var g = GAL[i];
-    gOut.innerHTML = '<p class="mono" style="color:var(--gold);margin:0">' + esc(PART[i]) + ' · ' + esc(g[1]) + '</p><p class="glyr">“' + esc(g[3]).replace(/ \/ /g, '<br>') + '”</p><p class="gpair">Paired with the <b>' + esc(g[2]) + '</b></p><p>' + esc(g[4]) + '</p>';
+    gOut.innerHTML = '<p class="mono" style="color:var(--gold);margin:0">' + esc(PART[i]) + ' · ' + esc(g[1]) + '</p><p class="glyr">“' + esc(g[3]).replace(/ \/ /g, '<br>') + '”</p><p class="gpair">Paired with <b>' + esc(g[2]) + '</b></p><p>' + esc(g[4]) + '</p>';
   }
   GAL.forEach(function (g, i) { var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'tab'); b.textContent = '“' + g[0] + '”'; b.addEventListener('click', function () { pickG(i); }); gBox.appendChild(b); });
   pickG(0);
