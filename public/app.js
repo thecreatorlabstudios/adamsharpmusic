@@ -143,10 +143,11 @@
     h.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown') setSheet(sheet === 'full' ? 'mid' : 'hide'); else if (e.key === 'ArrowUp') setSheet(sheet === 'hide' ? 'mid' : 'full'); });
     $('sheetBack').addEventListener('click', function () { setSheet('mid'); });
   })();
+  panel.addEventListener('scroll', function () { panel.classList.toggle('scrolled', panel.scrollTop > 6); }, { passive: true });
   function openPanel(kind, idx) {
     panelKind = kind; setSheet('mid'); panel.classList.toggle('is-scene', kind === 'scene');
     panelBody.innerHTML = kind === 'scene' ? sceneHTML(idx) : PANELS[kind]();
-    panel.scrollTop = 0;
+    panel.scrollTop = 0; panel.classList.remove('scrolled');
     panel.classList.add('open'); panel.setAttribute('aria-hidden', 'false');
     setNav(kind === 'scene' ? 'explore' : kind);
     tickCountdown();

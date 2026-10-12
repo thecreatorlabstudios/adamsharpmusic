@@ -198,3 +198,7 @@ details summary { cursor: pointer; color: var(--gold); margin-top: 14px; }
 /* small hint under the bar on the galaxy cards, phones only */
 .mode-phone .panel.is-scene:not(.sheet-hide):not(.sheet-full) .handle { height: 54px; }
 .mode-phone .panel.is-scene:not(.sheet-hide):not(.sheet-full) .handle::after { content: "\2193  Pull down to see the galaxy"; display: block; margin-top: 8px; text-align: center; font: 500 0.68rem/1 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); opacity: 0.9; }
+.mode-phone .panel.is-scene:not(.sheet-hide):not(.sheet-full) .handle { background: linear-gradient(to bottom, #14152C 78%, rgba(20, 21, 44, 0)); }
+.mode-phone .panel.is-scene:not(.sheet-hide):not(.sheet-full) .handle::after { transition: opacity .2s ease; }
+.mode-phone .panel.is-scene.scrolled:not(.sheet-hide):not(.sheet-full) .handle::after { opacity: 0; }
+.mode-phone .close { z-index: 4; }
