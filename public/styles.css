@@ -145,7 +145,8 @@ details summary { cursor: pointer; color: var(--gold); margin-top: 14px; }
 .mode-phone .hint { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
 .mode-phone .toast { top: calc(110px + env(safe-area-inset-top, 0px)); }
 .mode-phone .panel { left: 0; right: 0; bottom: 0; height: min(64dvh, 560px); border-width: 1px 0 0; border-radius: 18px 18px 0 0; transform: translateY(40px); padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); z-index: 22; }
-.mode-phone .handle { display: block; width: 44px; height: 4px; border-radius: 2px; background: rgba(178, 199, 246, 0.35); margin: 10px auto 0; }
+.mode-phone .handle { display: block; position: sticky; top: 0; z-index: 3; height: 34px; margin: 0; touch-action: none; cursor: grab; }
+.mode-phone .handle::before { content: ""; display: block; width: 44px; height: 4px; border-radius: 2px; background: rgba(178, 199, 246, 0.5); margin: 15px auto 0; }
 .mode-phone .panel-body { padding: 8px 20px 24px; }
 .mode-phone .close { margin: 8px 12px 0 0; }
 .mode-phone .sound { padding: 10px 12px; }
@@ -183,3 +184,13 @@ details summary { cursor: pointer; color: var(--gold); margin-top: 14px; }
 .nav .navlink { font: 500 0.72rem/1 var(--f-mono); letter-spacing: 0.2em; text-transform: uppercase; padding: 11px 15px; border-radius: 999px; border: 1px solid var(--line); background: rgba(9, 8, 22, 0.55); color: var(--dim); text-decoration: none; display: inline-flex; align-items: center; }
 .nav .navlink:hover { color: var(--ink); }
 .mode-phone .nav .navlink { flex: 1; justify-content: center; padding: 14px 4px; border: 0; background: transparent; font-size: 0.68rem; letter-spacing: 0.16em; }
+
+/* PHONE CARD: three positions. Middle is the normal card. Pull the bar down and only a small pill is left (the galaxy is full screen). Pull it up and the card goes full screen with a back arrow. */
+.sheet-back { display: none; }
+.mode-phone .panel { transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .3s ease, height .4s ease, bottom .4s ease, border-radius .3s ease; }
+.mode-phone .panel.open.sheet-hide { height: 34px; bottom: calc(66px + env(safe-area-inset-bottom, 0px)); left: calc(50% - 76px); right: auto; width: 152px; background: rgba(9, 8, 22, 0.55); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; padding-bottom: 0; }
+.mode-phone .panel.open.sheet-hide .panel-body, .mode-phone .panel.open.sheet-hide .close { display: none; }
+.mode-phone .panel.open.sheet-full { top: 0; height: 100dvh; border-radius: 0; z-index: 40; padding-bottom: env(safe-area-inset-bottom, 0px); }
+.mode-phone .panel.open.sheet-full .panel-body { padding-top: 54px; }
+.mode-phone .panel.open.sheet-full .sheet-back { display: flex; position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); left: 12px; z-index: 4; width: 44px; height: 44px; align-items: center; justify-content: center; font-size: 1.4rem; border-radius: 999px; border: 1px solid var(--line); background: rgba(9, 8, 22, 0.8); color: var(--ink); cursor: pointer; }
+.mode-phone .panel.open.sheet-full .close { margin-top: 10px; }

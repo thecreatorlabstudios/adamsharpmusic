@@ -77,6 +77,13 @@
 
   /* ================= STATE ================= */
   var found = {}, foundCount = 0, unlocked = false, pendingFinale = false, panelKind = null, selected = -1;
+  /* the browser remembers which galaxies were visited */
+  var SAVE_KEY = 'adamsharp.fireworks.v1';
+  try {
+    var saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+    if (saved && saved.found) { Object.keys(saved.found).forEach(function (k) { var n = +k; if (saved.found[k] && n >= 0 && n <= 8) { found[n] = true; if (n !== 8) foundCount++; } }); unlocked = !!saved.unlocked && foundCount >= 8; }
+  } catch (e) {}
+  function saveProgress() { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ found: found, unlocked: unlocked })); } catch (e) {} }
   var world = null; // set when 3D starts
 
   /* ================= PANELS ================= */
@@ -112,8 +119,32 @@
         '<details><summary class="mono">Read the lyrics</summary>' + lyricsHTML() + '</details>';
     }
   };
+  var sheet = 'mid';
+  function setSheet(s) { sheet = s; panel.classList.toggle('sheet-hide', s === 'hide'); panel.classList.toggle('sheet-full', s === 'full'); panel.style.transform = ''; panel.style.transition = ''; }
+  (function () {
+    var h = $('handle'), y0 = 0, dy = 0, drag = false, moved = false;
+    /* the handle drags the card; while only the small pill is showing, the whole pill does */
+    panel.addEventListener('pointerdown', function (e) {
+      if (!phone || !(sheet === 'hide' || e.target.closest('.handle'))) return;
+      drag = true; moved = false; y0 = e.clientY; dy = 0; try { panel.setPointerCapture(e.pointerId); } catch (x) {} panel.style.transition = 'none';
+    });
+    panel.addEventListener('pointermove', function (e) {
+      if (!drag) return; dy = e.clientY - y0; if (Math.abs(dy) > 6) moved = true;
+      if (dy > 0 && sheet !== 'hide') panel.style.transform = 'translateY(' + dy + 'px)';
+    });
+    function end() {
+      if (!drag) return; drag = false;
+      if (!moved) { setSheet(sheet === 'hide' ? 'mid' : sheet); return; }
+      if (dy > 60) setSheet(sheet === 'full' ? 'mid' : 'hide');
+      else if (dy < -60) setSheet(sheet === 'hide' ? 'mid' : 'full');
+      else setSheet(sheet);
+    }
+    panel.addEventListener('pointerup', end); panel.addEventListener('pointercancel', end);
+    h.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown') setSheet(sheet === 'full' ? 'mid' : 'hide'); else if (e.key === 'ArrowUp') setSheet(sheet === 'hide' ? 'mid' : 'full'); });
+    $('sheetBack').addEventListener('click', function () { setSheet('mid'); });
+  })();
   function openPanel(kind, idx) {
-    panelKind = kind;
+    panelKind = kind; setSheet('mid');
     panelBody.innerHTML = kind === 'scene' ? sceneHTML(idx) : PANELS[kind]();
     panel.scrollTop = 0;
     panel.classList.add('open'); panel.setAttribute('aria-hidden', 'false');
@@ -227,7 +258,7 @@
     found[i] = true;
     if (!SCENES[i].holy) foundCount++;
     if (foundCount >= GOAL && !unlocked) { unlocked = true; pendingFinale = true; }
-    paintMeter();
+    saveProgress(); paintMeter();
     return true;
   }
   var kb = $('kb');
@@ -825,12 +856,12 @@
     });
 
     /* ---------- Frame loop ---------- */
-    var dtSm = 0.016, magKeep = -1, t0 = performance.now(), last = t0, assemble0 = t0, gateT = 0, burstT = -1e9, warpA = 0, lastG = 0;
+    var dtSm = 0.016, magKeep = -1, t0 = performance.now(), last = t0, assemble0 = t0, gateT = unlocked ? 1 : 0, burstT = -1e9, warpA = 0, lastG = 0;
     function frame(nowMs) {
       requestAnimationFrame(frame);
       if (document.hidden) return;
       var dt = Math.min((nowMs - last) / 1000, 0.05); last = nowMs; dtSm += (dt - dtSm) * 0.2; dt = dtSm; var t = (nowMs - t0) / 1000; tU.value = t;
-      var hasPanel = panelKind !== null;
+      var hasPanel = panelKind !== null && sheet !== 'hide';
 
       /* audio */
       var e = 0;
