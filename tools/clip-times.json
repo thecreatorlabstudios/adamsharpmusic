@@ -1,5 +1,5 @@
 {
-  "_help": "Start and end of each lyric in the master, as seconds or m:ss. Leave a clip as null to skip it. Order matches the galaxies in the song.",
+  "_help": "Each clip starts at 'start' and plays 25 seconds, fading out over the last 2 seconds. Seconds or m:ss. Leave start null to skip a clip.",
   "clips": [
     {
       "name": "The rooster (Verse 1): I denied you three times / I heard the rooster crow",
@@ -9,42 +9,42 @@
     {
       "name": "Bread and wine (Verse 2): I ate the bread and drank the wine / Then fell asleep during prayer",
       "start": "1:17",
-      "end": "1:43"
+      "end": "1:42"
     },
     {
       "name": "Lifted up (Chorus): So I'll fall down ... Take me in your arms",
       "start": "0:41",
-      "end": "1:09"
+      "end": "1:06"
     },
     {
       "name": "Moses (build): If you shone upon Moses / Would you shine upon me?",
       "start": "2:47",
-      "end": "2:59"
+      "end": "3:12"
     },
     {
       "name": "Lazarus (build): Like when you gave life to Lazarus",
       "start": "3:01",
-      "end": "3:08"
+      "end": "3:26"
     },
     {
       "name": "The sea (build): When you parted the sea",
       "start": "3:09",
-      "end": "3:16"
+      "end": "3:34"
     },
     {
       "name": "The fire (build): When you stood in the fire",
       "start": "3:18",
-      "end": "3:25"
+      "end": "3:43"
     },
     {
       "name": "The storm (build): Calmed the storm with a word",
       "start": "3:26",
-      "end": "3:32"
+      "end": "3:51"
     },
     {
       "name": "The Holy Place (closing): Take me past the outer courts / Into the Holy Place",
       "start": "3:49",
-      "end": "4:03"
+      "end": "4:14"
     }
   ]
 }
