@@ -12,7 +12,7 @@ const m={};
 JSON.parse(fs.readFileSync(times,"utf8")).clips.forEach((c,i)=>{
   if(c.start==null||c.end==null) return;
   const s=sec(c.start), e=sec(c.end), f=String(i+1).padStart(2,"0")+".mp3", d=e-s;
-  cp.execFileSync("ffmpeg",["-v","error","-y","-ss",String(s),"-t",String(d),"-i",master,"-af","afade=t=in:d=0.25,afade=t=out:st="+Math.max(0,d-0.6)+":d=0.6","-c:a","libmp3lame","-b:a","96k",path.join(out,f)]);
+  cp.execFileSync("ffmpeg",["-v","error","-y","-ss",String(s),"-t",String(d),"-i",master,"-af","loudnorm=I=-16:LRA=11:TP=-1.5,afade=t=in:d=0.25,afade=t=out:st="+Math.max(0,d-0.6)+":d=0.6","-c:a","libmp3lame","-b:a","96k",path.join(out,f)]);
   m[i]=f;
 });
 fs.writeFileSync(path.join(out,"manifest.json"),JSON.stringify(m));

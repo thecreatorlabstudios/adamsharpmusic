@@ -1,14 +1,50 @@
 {
   "_help": "Start and end of each lyric in the master, as seconds or m:ss. Leave a clip as null to skip it. Order matches the galaxies in the song.",
   "clips": [
-    { "name": "The rooster (Verse 1): I denied you three times / I heard the rooster crow", "start": null, "end": null },
-    { "name": "Bread and wine (Verse 2): I ate the bread and drank the wine / Then fell asleep during prayer", "start": null, "end": null },
-    { "name": "Lifted up (Chorus): So I'll fall down ... Take me in your arms", "start": null, "end": null },
-    { "name": "Moses (build): If you shone upon Moses / Would you shine upon me?", "start": null, "end": null },
-    { "name": "Lazarus (build): Like when you gave life to Lazarus", "start": null, "end": null },
-    { "name": "The sea (build): When you parted the sea", "start": null, "end": null },
-    { "name": "The fire (build): When you stood in the fire", "start": null, "end": null },
-    { "name": "The storm (build): Calmed the storm with a word", "start": null, "end": null },
-    { "name": "The Holy Place (closing): Take me past the outer courts / Into the Holy Place", "start": null, "end": null }
+    {
+      "name": "The rooster (Verse 1): I denied you three times / I heard the rooster crow",
+      "start": "0:15",
+      "end": "0:40"
+    },
+    {
+      "name": "Bread and wine (Verse 2): I ate the bread and drank the wine / Then fell asleep during prayer",
+      "start": "1:17",
+      "end": "1:43"
+    },
+    {
+      "name": "Lifted up (Chorus): So I'll fall down ... Take me in your arms",
+      "start": "0:41",
+      "end": "1:09"
+    },
+    {
+      "name": "Moses (build): If you shone upon Moses / Would you shine upon me?",
+      "start": "2:47",
+      "end": "2:59"
+    },
+    {
+      "name": "Lazarus (build): Like when you gave life to Lazarus",
+      "start": "3:01",
+      "end": "3:08"
+    },
+    {
+      "name": "The sea (build): When you parted the sea",
+      "start": "3:09",
+      "end": "3:16"
+    },
+    {
+      "name": "The fire (build): When you stood in the fire",
+      "start": "3:18",
+      "end": "3:25"
+    },
+    {
+      "name": "The storm (build): Calmed the storm with a word",
+      "start": "3:26",
+      "end": "3:32"
+    },
+    {
+      "name": "The Holy Place (closing): Take me past the outer courts / Into the Holy Place",
+      "start": "3:49",
+      "end": "4:03"
+    }
   ]
 }
