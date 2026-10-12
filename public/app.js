@@ -144,7 +144,7 @@
     $('sheetBack').addEventListener('click', function () { setSheet('mid'); });
   })();
   function openPanel(kind, idx) {
-    panelKind = kind; setSheet('mid');
+    panelKind = kind; setSheet('mid'); panel.classList.toggle('is-scene', kind === 'scene');
     panelBody.innerHTML = kind === 'scene' ? sceneHTML(idx) : PANELS[kind]();
     panel.scrollTop = 0;
     panel.classList.add('open'); panel.setAttribute('aria-hidden', 'false');
