@@ -27,3 +27,7 @@ The site lives in `public/` (`index.html`, `styles.css`, `app.js`, `assets/`, `v
 ## Still open
 Pre-save link (button disabled), other streaming links, contact/booking details, domain and hosting, final full-song audio, scope and budget.
 Ideas not built yet: tap-the-face firework, hidden story sparks, line timing from the final master, gyroscope tilt on phones (not allowed inside Claude artifacts, fine on a real site).
+
+## Song audio
+- "Enter with sound" plays `public/assets/fireworks-instrumental.mp3`, a vocal-reduced draft made from the master with ffmpeg (center-channel cancel). Replace it with a real instrumental when Adam has one (same filename).
+- Each galaxy plays its lyric clip over the music, which ducks while the clip plays. Clips come from the master, which stays out of the repo: fill in `tools/clip-times.json`, then run `sh tools/make-clips.sh /path/to/master.mp3`. Missing clips are skipped.

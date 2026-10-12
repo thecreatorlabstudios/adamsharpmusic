@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  var ASSET = { cover: '/assets/cover.jpg', suit: '/assets/suit.jpg', smile: '/assets/smile.jpg', audio: '/assets/fireworks-promo.mp3' };
+  var ASSET = { cover: '/assets/cover.jpg', suit: '/assets/suit.jpg', smile: '/assets/smile.jpg', audio: '/assets/fireworks-instrumental.mp3', clips: '/assets/clips/' };
   var $ = function (id) { return document.getElementById(id); };
   /* the server says whether a login is active (kept for the preview login) */
   try { fetch('/api/config', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (c) { if (!c) return; if (c.auth) document.body.setAttribute('data-auth', '1'); }).catch(function () {}); } catch (e) {}
@@ -108,7 +108,7 @@
   var PANELS = {
     release: function () {
       return '<img class="cover" src="' + ASSET.cover + '" alt="Fireworks single cover art by Adam Sharp"><p class="eyebrow mono">New single · Christian worship</p><h2>Fireworks</h2><p class="dim">Adam Sharp · Out Sunday, November 22, 2026</p>' + countHTML() +
-        '<div class="actions"><a class="btn btn-gold" href="' + PRESAVE + '" target="_blank" rel="noopener">Pre-save on your music app</a><button class="btn btn-ghost" type="button" data-sound-toggle>' + (soundOn ? 'Pause the promo' : 'Play the promo') + '</button></div>' +
+        '<div class="actions"><a class="btn btn-gold" href="' + PRESAVE + '" target="_blank" rel="noopener">Pre-save on your music app</a><button class="btn btn-ghost" type="button" data-sound-toggle>' + (soundOn ? 'Pause the music' : 'Play the music') + '</button></div>' +
         '<details><summary class="mono">Read the lyrics</summary>' + lyricsHTML() + '</details>';
     }
   };
@@ -141,7 +141,7 @@
     var g = e.target.closest('[data-gal]');
     if (g) { var v = g.getAttribute('data-gal'); if (v === 'back') closePanel(); else gotoScene(+v); return; }
     var go = e.target.closest('[data-go]'); if (go) { openPanel(go.getAttribute('data-go')); return; }
-    if (e.target.closest('[data-sound-toggle]')) { setSound(!soundOn); var b = panelBody.querySelector('[data-sound-toggle]'); if (b) b.textContent = soundOn ? 'Pause the promo' : 'Play the promo'; }
+    if (e.target.closest('[data-sound-toggle]')) { setSound(!soundOn); var b = panelBody.querySelector('[data-sound-toggle]'); if (b) b.textContent = soundOn ? 'Pause the music' : 'Play the music'; }
   });
 
   /* ================= COUNTDOWN ================= */
@@ -160,18 +160,44 @@
   var audio = new Audio(); audio.src = ASSET.audio; audio.loop = true; audio.preload = 'auto';
   var soundOn = false, actx = null, an = null, bins = null, audioE = 0, ema = 0, lastBeat = 0;
   var soundBtn = $('sound');
+  /* the lyric clips: each galaxy plays its own part of the song over the instrumental, which ducks while it plays */
+  var clipEl = new Audio(); clipEl.preload = 'auto'; var musicGain = null, clipGain = null, clipManifest = {}, clipPrimed = false, clipNow = -1;
+  try { fetch(ASSET.clips + 'manifest.json', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (m) { clipManifest = m || {}; }).catch(function () {}); } catch (e) {}
+  function ramp(g, v, secs) { if (!g) return; try { g.gain.cancelScheduledValues(actx.currentTime); g.gain.setTargetAtTime(v, actx.currentTime, secs); } catch (e) {} }
+  function primeClip() { /* unlock the second audio element on the first tap, so clips can start later without another tap */
+    if (clipPrimed) return; clipPrimed = true;
+    try {
+      var n = 800, b = new ArrayBuffer(44 + n * 2), v = new DataView(b), w = function (o, s) { for (var i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+      w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 8000, true); v.setUint32(28, 16000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n * 2, true);
+      clipEl.src = URL.createObjectURL(new Blob([b], { type: 'audio/wav' })); var p0 = clipEl.play(); if (p0 && p0.catch) p0.catch(function () {});
+    } catch (e) {}
+  }
+  function stopClip() {
+    clipNow = -1; try { clipEl.pause(); } catch (e) {}
+    if (musicGain) ramp(musicGain, 1, 0.35); else audio.volume = 1;
+  }
+  function playClip(i) {
+    stopClip(); var f = clipManifest[i]; if (!soundOn || !f) return;
+    clipNow = i; clipEl.loop = false; clipEl.src = ASSET.clips + f; clipEl.currentTime = 0;
+    if (musicGain) { ramp(musicGain, 0.1, 0.25); ramp(clipGain, 1, 0.05); } else audio.volume = 0.12;
+    var p1 = clipEl.play(); if (p1 && p1.catch) p1.catch(function () { stopClip(); });
+  }
+  clipEl.addEventListener('ended', function () { clipNow = -1; if (musicGain) ramp(musicGain, 1, 0.6); else audio.volume = 1; });
   function paintSound() { soundBtn.textContent = soundOn ? 'Sound on' : 'Sound off'; soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false'); }
   function setupAnalyser() {
     if (an) return;
     try {
       var AC = window.AudioContext || window.webkitAudioContext; actx = new AC();
-      var src = actx.createMediaElementSource(audio); an = actx.createAnalyser(); an.fftSize = 256; an.smoothingTimeConstant = 0.6;
-      src.connect(an); an.connect(actx.destination); bins = new Uint8Array(an.frequencyBinCount);
+      an = actx.createAnalyser(); an.fftSize = 256; an.smoothingTimeConstant = 0.6;
+      musicGain = actx.createGain(); clipGain = actx.createGain();
+      actx.createMediaElementSource(audio).connect(musicGain); actx.createMediaElementSource(clipEl).connect(clipGain);
+      musicGain.connect(an); clipGain.connect(an); an.connect(actx.destination); bins = new Uint8Array(an.frequencyBinCount);
     } catch (e) { an = null; }
   }
   function setSound(on) {
     soundOn = on; paintSound();
-    if (on) { setupAnalyser(); if (actx && actx.state === 'suspended') actx.resume(); var p = audio.play(); if (p && p.catch) p.catch(function () { soundOn = false; paintSound(); }); }
+    if (!on) stopClip();
+    if (on) { primeClip(); setupAnalyser(); if (actx && actx.state === 'suspended') actx.resume(); var p = audio.play(); if (p && p.catch) p.catch(function () { soundOn = false; paintSound(); }); }
     else audio.pause();
   }
   soundBtn.addEventListener('click', function () { setSound(!soundOn); });
@@ -713,13 +739,14 @@
       curG = i; mode = 'galaxy';
       Object.keys(galaxies).forEach(function (k) { galaxies[k].grp.visible = false; });
       var G = getGalaxy(i); G.grp.visible = true; setWarp(i); G.gain = reduce ? 1 : 0.18; G.waveT = performance.now();
+      playClip(i);
       var first = markFound(i); selected = i; openPanel('scene', i); paintLight(lights[i]); labelsEl.style.display = 'none';
       gAz = 0; gEl = 0.12; gZoomT = gZoom = 1; gFocusOn = false; gGoal.set(0, 0, 0); gTarget.set(0, 0, 0);
       hintEl.textContent = galaxyHint; hintEl.classList.remove('gone'); clearTimeout(showGalaxy.h); showGalaxy.h = setTimeout(function () { hintEl.classList.add('gone'); }, 7000);
       if (first) { FWg.burst(0, 2.2, 0, 1.3, PAL_COVER, !!SCENES[i].lift); try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {} toast(SCENES[i].holy ? 'You are in the Holy Place' : 'The light fills this galaxy'); }
       else toast(SCENES[i].short);
     }
-    function showCosmos() { mode = 'cosmos'; hintEl.textContent = cosmosHint; hintEl.classList.add('gone'); labelsEl.style.display = ''; if (curG >= 0 && galaxies[curG]) galaxies[curG].grp.visible = false; }
+    function showCosmos() { stopClip(); mode = 'cosmos'; hintEl.textContent = cosmosHint; hintEl.classList.add('gone'); labelsEl.style.display = ''; if (curG >= 0 && galaxies[curG]) galaxies[curG].grp.visible = false; }
     function exitGalaxy() {
       if (tr || mode !== 'galaxy') return;
       hidePanel(); trIdx = curG; setWarp(curG);
