@@ -1,5 +1,5 @@
-// Local copy of how Vercel runs this project: middleware first, then /api functions or static files from ./public.
-// Run:  SITE_USERS=... SESSION_SECRET=... node tools/dev.mjs     (http://localhost:3000)
+// Local copy of how Vercel serves this project: static files from ./public with the headers in vercel.json.
+// Run:  node tools/dev.mjs     (http://localhost:3000)
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -7,10 +7,6 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = path.join(ROOT, 'public');
-process.env.COOKIE_SECURE ??= '0'; // plain http locally
-const { default: middleware } = await import('../middleware.js');
-const { default: login } = await import('../api/login.js');
-const { default: logout } = await import('../api/logout.js');
 const vercel = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
 const rules = (vercel.headers || []).map((r) => ({ re: new RegExp('^' + r.source + '$'), headers: r.headers }));
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.txt': 'text/plain' };
@@ -39,24 +35,10 @@ function serveStatic(req, res, pathname) {
   fs.createReadStream(file).pipe(res);
 }
 
-function readBody(req) { return new Promise((r) => { const c = []; req.on('data', (d) => c.push(d)); req.on('end', () => r(Buffer.concat(c).toString())); }); }
-
 export function start(port) {
   return http.createServer(async (req, res) => {
     try {
       const url = new URL(req.url, 'http://localhost'), pathname = url.pathname;
-      const request = new Request(url, { method: req.method, headers: Object.fromEntries(Object.entries(req.headers).filter(([, v]) => typeof v === 'string')) });
-      const mw = await middleware(request);
-      if (mw.headers.get('x-middleware-next') !== '1') { // middleware answered itself
-        const h = {}; mw.headers.forEach((v, k) => { h[k] = v; });
-        return end(res, pathname, mw.status, h, Buffer.from(await mw.arrayBuffer()));
-      }
-      if (pathname === '/api/login' || pathname === '/api/logout') {
-        const raw = req.method === 'POST' ? await readBody(req) : '';
-        req.body = Object.fromEntries(new URLSearchParams(raw));
-        const origEnd = res.end.bind(res); res.end = (...a) => { applyHeaders(pathname, {}); return origEnd(...a); };
-        return (pathname === '/api/login' ? login : logout)(req, res);
-      }
       if (pathname.startsWith('/api/')) return end(res, pathname, 404, {}, 'Not found');
       return serveStatic(req, res, pathname);
     } catch (e) { console.error('[dev error]', e); if (!res.headersSent) res.writeHead(500); res.end('Server error'); }

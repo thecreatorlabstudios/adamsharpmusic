@@ -1,13 +1,12 @@
 {
-  "name": "adam-sharp-fireworks",
+  "name": "adam-sharp-site",
   "version": "1.0.0",
   "private": true,
-  "description": "Adam Sharp's artist site and the Fireworks single experience. Deploys to Vercel. Set REQUIRE_LOGIN=false to make it public.",
+  "description": "Adam Sharp's artist site. Static site, deploys to Vercel.",
   "type": "module",
   "scripts": {
     "dev": "node tools/dev.mjs",
-    "test": "node tools/selftest.mjs",
-    "user": "node tools/hash.mjs"
+    "test": "node tools/selftest.mjs"
   },
   "engines": {
     "node": ">=18"

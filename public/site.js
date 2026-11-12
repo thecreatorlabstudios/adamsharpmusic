@@ -54,6 +54,4 @@
   }
   tick(); setInterval(tick, 1000);
 
-  /* sign-out button only while a login is active */
-  try { fetch('/api/config', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (c) { if (c && c.auth) document.getElementById('signout').hidden = false; }).catch(function () {}); } catch (e) {}
 })();
