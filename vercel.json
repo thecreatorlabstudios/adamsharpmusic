@@ -45,7 +45,7 @@
       ]
     },
     {
-      "source": "/(index.html|login.html|fireworks)?",
+      "source": "/(index.html|login.html)?",
       "headers": [
         {
           "key": "Cache-Control",

@@ -31,7 +31,7 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fail++;
   const s = await boot({});
   let r = await s.get('/', { Accept: 'text/html' });
   ok(r.status === 303 && r.headers.get('location').startsWith('/login'), 'anonymous page request is sent to /login');
-  for (const p of ['/assets/cover.jpg', '/assets/fireworks-promo.mp3', '/app.js', '/styles.css', '/vendor/three.r128.min.js', '/index.html', '/fireworks', '/api/config']) { r = await s.get(p); ok(r.status === 401, `anonymous ${p} is blocked (${r.status})`); }
+  for (const p of ['/assets/cover.jpg', '/site.js', '/site.css', '/index.html', '/api/config']) { r = await s.get(p); ok(r.status === 401, `anonymous ${p} is blocked (${r.status})`); }
   r = await s.get('/login'); const loginHtml = await r.text();
   ok(r.status === 200 && loginHtml.includes('Sign in') && loginHtml.includes('/api/login'), 'login page loads without signing in');
   ok((await s.get('/login.js')).status === 200, 'login script loads without signing in');
@@ -54,11 +54,10 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fail++;
   const session = setCookie.split(';')[0];
 
   r = await s.get('/', { Cookie: session, Accept: 'text/html' }); ok(r.status === 200 && (await r.text()).includes('id="releaseList"'), 'signed-in user gets the landing page');
-  r = await s.get('/fireworks', { Cookie: session, Accept: 'text/html' }); ok(r.status === 200 && (await r.text()).includes('<canvas id="gl"'), 'signed-in user gets the Fireworks experience');
   r = await s.get('/assets/cover.jpg', { Cookie: session }); ok(r.status === 200 && r.headers.get('content-type') === 'image/jpeg', 'signed-in user gets assets');
   r = await s.get('/api/config', { Cookie: session }); const cfg = await r.json(); ok(r.status === 200 && cfg.auth === true , 'signed-in config says a login is active');
-  r = await s.get('/assets/fireworks-promo.mp3', { Cookie: session, Range: 'bytes=0-99' }); ok(r.status === 206 && r.headers.get('content-range').startsWith('bytes 0-99/') && (await r.arrayBuffer()).byteLength === 100, 'audio byte ranges work');
-  r = await s.get('/assets/fireworks-promo.mp3', { Cookie: session, Range: 'bytes=99999999-' }); ok(r.status === 416, 'bad range gets 416');
+  r = await s.get('/assets/cover.jpg', { Cookie: session, Range: 'bytes=0-99' }); ok(r.status === 206 && r.headers.get('content-range').startsWith('bytes 0-99/') && (await r.arrayBuffer()).byteLength === 100, 'file byte ranges work');
+  r = await s.get('/assets/cover.jpg', { Cookie: session, Range: 'bytes=99999999-' }); ok(r.status === 416, 'bad range gets 416');
   for (const p of ['/middleware.js', '/api/login.js', '/vercel.json', '/package.json', '/tools/hash.mjs', '/..%2fmiddleware.js', '/%2e%2e/package.json', '/assets/%2e%2e/%2e%2e/middleware.js', '/.env', '/%00']) {
     r = await s.get(p, { Cookie: session }); const b = await r.text(); ok(r.status !== 200 || !/REQUIRE_LOGIN|scryptSync|"name": "adam/.test(b), `signed-in ${p} leaks nothing (${r.status})`);
   }

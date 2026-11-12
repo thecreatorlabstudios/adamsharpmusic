@@ -50,5 +50,5 @@ If you keep the domain at Hostinger but also have a Hostinger hosting plan, you 
 ## Limits to know
 - The wrong-password lockout (8 tries, 10 minutes) is per server instance, and Vercel can run several. The real protection is the long generated passwords from `tools/hash.mjs`. If you want a hard shared lockout later, add Vercel KV or Upstash Redis.
 - This keeps casual and automated visitors out. Anyone with a password sees everything, so give one login per person and remove people by deleting their entry from `SITE_USERS`.
-- The only outside request is Google Fonts. three.js is hosted on the site itself.
+- The only outside request is Google Fonts.
 - I could not test on Vercel itself (no account was connected). The login logic is tested through a local copy of Vercel's request flow. Do one check after the first deploy: open the site in a private window, confirm you land on the login page, and confirm `https://yourdomain.com/assets/cover.jpg` also sends you to login.
